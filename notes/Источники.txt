@@ -1,0 +1,2 @@
+1) http://mikerub.narod.ru/f3dengine.htm - преобразования
+2) https://compgraphics.info/3D/3d_affine_transformations.php - преобразования
