@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 
 from design import Ui_MainWindow
-from math import radians
 from models import Model, Cube
+from mymath import radians, sign
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPainter
 
@@ -16,7 +16,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.angle = radians(15)
         self.load_model()
 
-        self.loadModel.clicked.connect(self.load_model)
+        self.x = 0
+        self.y = 0
+
+        self.loadButton.clicked.connect(self.load_model)
         self.scaleSlider.valueChanged.connect(self.scale_model)
 
         self.right.clicked.connect(lambda: self.turn_model_oy(self.angle))
@@ -81,10 +84,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.model.turn_model_oz(angle)
         self.update()
 
+    def mousePressEvent(self, event):
+        if self.x != event.x() or self.y != event.y():
+            self.x, self.y = event.x(), event.y()
+
     def mouseMoveEvent(self, event):
-        # print(help(event))
-        print(event.x(), event.y())
+        # if event.buttons() == QtCore.Qt.LeftButton:
+        #     print("Left Button Clicked")
+        x1, y1 = event.x(), event.y()
+        dx, dy = sign(self.x - x1), sign(self.y - y1)
+
         if event.buttons() == QtCore.Qt.LeftButton:
-            print("Left Button Clicked")
-        elif event.buttons() == QtCore.Qt.RightButton:
-            print("Right Button Clicked")
+            self.turn_model_oy(radians(dx)) if dx else self.turn_model_ox(radians(dy))
+            self.update()
+
+        self.x, self.y = x1, y1

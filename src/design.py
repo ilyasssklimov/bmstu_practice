@@ -23,9 +23,9 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QtCore.QSize(1304, 858))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.loadModel = QtWidgets.QPushButton(self.centralwidget)
-        self.loadModel.setGeometry(QtCore.QRect(1110, 70, 161, 31))
-        self.loadModel.setObjectName("loadModel")
+        self.loadButton = QtWidgets.QPushButton(self.centralwidget)
+        self.loadButton.setGeometry(QtCore.QRect(1110, 70, 161, 31))
+        self.loadButton.setObjectName("loadButton")
         self.models = QtWidgets.QComboBox(self.centralwidget)
         self.models.setGeometry(QtCore.QRect(1110, 31, 161, 31))
         self.models.setObjectName("models")
@@ -76,7 +76,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.loadModel.setText(_translate("MainWindow", "Загрузить"))
+        self.loadButton.setText(_translate("MainWindow", "Загрузить"))
         self.models.setItemText(0, _translate("MainWindow", "Кубик Рубика"))
         self.models.setItemText(1, _translate("MainWindow", "Пирамидка"))
         self.models.setItemText(2, _translate("MainWindow", "Мегаминкс"))

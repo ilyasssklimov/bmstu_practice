@@ -38,7 +38,6 @@ class Model:
 
     def turn_model_ox(self, angle):
         self.move_model(Point(-self.dx, -self.dy, -self.dz))
-        print(self.vertices[0])
         for i in range(len(self.vertices)):
             self.vertices[i].turn_ox(angle)
         self.move_model(Point(self.dx, self.dy, self.dz))
@@ -73,8 +72,6 @@ class Cube:
             Point(self.size + self.dx, -self.size + self.dy, self.size + self.dz),
             Point(self.size + self.dx, self.size + self.dy, self.size + self.dz),
             Point(-self.size + self.dx, self.size + self.dy, self.size + self.dz),
-
-            Point()
         ]
 
         self.edges = [
