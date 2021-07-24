@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from design import Ui_MainWindow
 from models import Model, Cube
 from mymath import radians, sign
+from point import Point
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPainter
 
@@ -36,7 +37,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         model = self.models.currentText()
 
         if model == 'Кубик Рубика':
+            # TODO: понять коммутативна ли операция поворота
             self.model = Model(Cube().vertices, Cube().edges)
+            self.turn_model_oy(radians(45))
+            self.turn_model_ox(radians(-30))
             self.update()
         else:
             print('Another model')
@@ -74,27 +78,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def turn_model_ox(self, angle):
         self.model.turn_model_ox(angle)
-        self.update()
 
     def turn_model_oy(self, angle):
         self.model.turn_model_oy(angle)
-        self.update()
 
     def turn_model_oz(self, angle):
         self.model.turn_model_oz(angle)
-        self.update()
 
     def mousePressEvent(self, event):
         if self.x != event.x() or self.y != event.y():
             self.x, self.y = event.x(), event.y()
 
     def mouseMoveEvent(self, event):
-        # if event.buttons() == QtCore.Qt.LeftButton:
-        #     print("Left Button Clicked")
         x1, y1 = event.x(), event.y()
-        dx, dy = sign(self.x - x1), sign(self.y - y1)
+        dx, dy = sign(x1 - self.x) * 3, sign(self.y - y1) * 3
 
-        if event.buttons() == QtCore.Qt.LeftButton:
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if modifiers == QtCore.Qt.ShiftModifier:
+            self.turn_model_oz(radians(dx))
+            self.update()
+        elif event.buttons() == QtCore.Qt.RightButton:
             self.turn_model_oy(radians(dx)) if dx else self.turn_model_ox(radians(dy))
             self.update()
 
