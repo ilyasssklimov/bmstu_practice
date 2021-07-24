@@ -9,10 +9,11 @@ class Model:
     def __init__(self, vertices, edges):
         self.vertices = vertices
         self.edges = edges
-        self.dx = Config().dx
-        self.dy = Config().dy
-        self.dz = Config().dz
         self.k = 1
+        self.cfg = Config()
+        self.dx = self.cfg.dx
+        self.dy = self.cfg.dy
+        self.dz = self.cfg.dz
 
     def draw_model(self, painter):
         # TODO: брать размеры канваса из интерфейса
@@ -57,21 +58,20 @@ class Model:
 
 class Cube:
     def __init__(self):
-        self.size = Config().size
-        self.dx = Config().dx
-        self.dy = Config().dy
-        self.dz = Config().dz
+        self.cfg = Config()
+        size = self.cfg.size
+        dx, dy, dz = self.cfg.dx, self.cfg.dy, self.cfg.dz
 
         self.vertices = [
-            Point(-self.size + self.dx, -self.size + self.dy, -self.size + self.dz),
-            Point(self.size + self.dx, -self.size + self.dy, -self.size + self.dz),
-            Point(self.size + self.dx, self.size + self.dy, -self.size + self.dz),
-            Point(-self.size + self.dx, self.size + self.dy, -self.size + self.dz),
+            Point(-size + dx, -size + dy, -size + dz),
+            Point(size + dx, -size + dy, -size + dz),
+            Point(size + dx, size + dy, -size + dz),
+            Point(-size + dx, size + dy, -size + dz),
 
-            Point(-self.size + self.dx, -self.size + self.dy, self.size + self.dz),
-            Point(self.size + self.dx, -self.size + self.dy, self.size + self.dz),
-            Point(self.size + self.dx, self.size + self.dy, self.size + self.dz),
-            Point(-self.size + self.dx, self.size + self.dy, self.size + self.dz),
+            Point(-size + dx, -size + dy, size + dz),
+            Point(size + dx, -size + dy, size + dz),
+            Point(size + dx, size + dy, size + dz),
+            Point(-size + dx, size + dy, size + dz),
         ]
 
         self.edges = [

@@ -1,5 +1,4 @@
-from PyQt5.QtCore import Qt
-
+from config import Config
 from design import Ui_MainWindow
 from models import Model, Cube
 from mymath import radians, sign
@@ -19,6 +18,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.x = 0
         self.y = 0
+        self.cfg = Config()
+        self.viewer = Point(self.cfg.dx, self.cfg.dy, self.cfg.dz)
 
         self.loadButton.clicked.connect(self.load_model)
         self.scaleSlider.valueChanged.connect(self.scale_model)
@@ -78,12 +79,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def turn_model_ox(self, angle):
         self.model.turn_model_ox(angle)
+        self.update()
 
     def turn_model_oy(self, angle):
         self.model.turn_model_oy(angle)
+        self.update()
 
     def turn_model_oz(self, angle):
         self.model.turn_model_oz(angle)
+        self.update()
 
     def mousePressEvent(self, event):
         if self.x != event.x() or self.y != event.y():
@@ -95,10 +99,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         modifiers = QtWidgets.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ShiftModifier:
-            self.turn_model_oz(radians(dx))
+            self.model.turn_model_oz(radians(dx))
             self.update()
         elif event.buttons() == QtCore.Qt.RightButton:
-            self.turn_model_oy(radians(dx)) if dx else self.turn_model_ox(radians(dy))
+            self.model.turn_model_oy(radians(dx)) if dx else self.turn_model_ox(radians(dy))
             self.update()
 
         self.x, self.y = x1, y1
