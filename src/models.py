@@ -5,8 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
 from matrix import Matrix3d, MatrixBody
-from mymath import remove_repeats, Vector, scalar_multiplication
-from pprint import pprint
+from mymath import remove_repeats
 
 
 class Model:
@@ -19,7 +18,7 @@ class Model:
         cfg = Config()
         self.dx, self.dy, self.dz = cfg.dx, cfg.dy, cfg.dz
         self.center = [self.dx, self.dy, self.dz, 1]
-        self.viewer = [self.dx, self.dy, -1000, 0]
+        self.viewer = [self.dx, self.dy, 1000000, 0]
 
     def draw_model(self, painter, invisible_sides):
         # TODO: брать размеры канваса из интерфейса

@@ -41,7 +41,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # TODO: понять коммутативна ли операция поворота
             self.model = Cube()
             self.model.turn_model_oy(radians(45))
-            self.model.turn_model_ox(radians(30))
+            self.model.turn_model_ox(radians(-30))
             self.update()
         else:
             print('Another model')
@@ -105,7 +105,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.model.turn_model_oz(radians(dx))
             self.update()
         elif event.buttons() == QtCore.Qt.RightButton:
-            self.model.turn_model_oy(radians(dx)) if dx else self.turn_model_ox(radians(dy))
+            if dx:
+                self.model.turn_model_oy(radians(dx))
+            if dy:
+                self.turn_model_ox(radians(dy))
             self.update()
 
         self.x, self.y = x1, y1
