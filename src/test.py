@@ -1,7 +1,3 @@
-a = [1, 2, 3]
-
-for i in range(len(a)):
-    r = a[i]
-    r *= 2
-
-print(a)
+a = [1, 2]
+b = [2, 3]
+print(next(iter(set(a) & set(b))))

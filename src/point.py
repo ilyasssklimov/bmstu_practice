@@ -10,6 +10,9 @@ class Point:
     def __str__(self):
         return f'({self.x}, {self.y}, {self.z})'
 
+    def __sub__(self, other):
+        return Point(self.x - other.x, self.y - other.y, self.z - other.z)
+
     def move(self, point):
         self.x += point.x
         self.y += point.y

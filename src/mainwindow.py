@@ -39,9 +39,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
-            self.model = Model(Cube().vertices, Cube().edges)
-            self.turn_model_oy(radians(45))
-            self.turn_model_ox(radians(-30))
+            self.model = Cube()
+            self.model.turn_model_oy(radians(45))
+            self.model.turn_model_ox(radians(30))
             self.update()
         else:
             print('Another model')
@@ -49,7 +49,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def paintEvent(self, event):
         painter = QPainter()
         painter.begin(self)
-        self.model.draw_model(painter)
+
+        invisible_sides = self.model.get_invisible_sides(self.model.sides, self.model.sides_edges)
+        self.model.draw_model(painter, invisible_sides)
+
         painter.end()
 
     def scale_model(self):

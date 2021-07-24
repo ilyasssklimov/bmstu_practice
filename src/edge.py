@@ -5,3 +5,7 @@ class Edge:
 
     def __str__(self):
         return f'{self.first}, {self.second}'
+
+    def get_points(self, vertices):
+        return [vertices[self.first], vertices[self.second]]
+
