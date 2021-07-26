@@ -1,3 +1,2 @@
-a = [1, 2]
-b = [2, 3]
-print(next(iter(set(a) & set(b))))
+a = {'a': 22, 'b': 12}
+print(list(a.values()))

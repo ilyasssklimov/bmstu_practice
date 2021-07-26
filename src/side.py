@@ -1,0 +1,2 @@
+class CubeSide:
+    pass

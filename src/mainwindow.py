@@ -50,9 +50,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         painter = QPainter()
         painter.begin(self)
 
-        invisible_sides = self.model.get_invisible_sides(self.model.sides, self.model.sides_edges)
-        self.model.draw_model(painter, invisible_sides)
-
+        invisible_sides, inside_invisible_edges = self.model.get_invisible_sides(self.model.sides,
+                                                                                 self.model.sides_edges,
+                                                                                 self.model.inside_sides_edges)
+        self.model.draw_model(painter, invisible_sides, inside_invisible_edges)
         painter.end()
 
     def scale_model(self):

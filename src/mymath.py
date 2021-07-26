@@ -41,6 +41,10 @@ def radians(angle):
     return angle * pi / 180
 
 
+def degrees(angle):
+    return angle * 180 / pi
+
+
 def sign(num):
     if num > 0:
         return 1

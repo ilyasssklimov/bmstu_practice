@@ -37,3 +37,15 @@ class Point:
         x, y = self.x, self.y
         self.x = x * cos(angle) - y * sin(angle)
         self.y = x * sin(angle) + y * cos(angle)
+
+    def add_x(self, number):
+        point = Point(self.x + number, self.y, self.z)
+        return point
+
+    def add_y(self, number):
+        point = Point(self.x, self.y + number, self.z)
+        return point
+
+    def add_z(self, number):
+        point = Point(self.x, self.y, self.z + number)
+        return point
