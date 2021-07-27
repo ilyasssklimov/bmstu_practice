@@ -57,3 +57,9 @@ class MatrixBody:
         for i in range(len(result)):
             if result[i] > 0:
                 self.negative(i)
+
+    def transform(self):
+        pass
+
+    def scale(self):
+        pass

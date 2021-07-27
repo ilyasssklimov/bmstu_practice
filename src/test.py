@@ -1,2 +1,8 @@
-a = {'a': 22, 'b': 12}
-print(list(a.values()))
+from point import Point
+
+
+a = Point(1, 2, 3)
+
+print(a)
+print(-a)
+print(a)

@@ -1,5 +1,6 @@
 from config import Config
 from design import Ui_MainWindow
+from drawer import QtDrawer
 from models import Model, Cube
 from mymath import radians, sign
 from point import Point
@@ -24,13 +25,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.loadButton.clicked.connect(self.load_model)
         self.scaleSlider.valueChanged.connect(self.scale_model)
 
-        self.right.clicked.connect(lambda: self.turn_model_oy(self.angle))
-        self.left.clicked.connect(lambda: self.turn_model_oy(-self.angle))
-        self.up.clicked.connect(lambda: self.turn_model_ox(self.angle))
-        self.down.clicked.connect(lambda: self.turn_model_ox(-self.angle))
-        self.up_right.clicked.connect(lambda: self.turn_model_oz(self.angle))
-        self.up_left.clicked.connect(lambda: self.turn_model_oz(-self.angle))
+        self.rotate_y_.clicked.connect(lambda: self.turn_model_oy(self.angle))
+        self.rotate_y.clicked.connect(lambda: self.turn_model_oy(-self.angle))
+        self.rotate_x.clicked.connect(lambda: self.turn_model_ox(self.angle))
+        self.rotate_x_.clicked.connect(lambda: self.turn_model_ox(-self.angle))
+        self.rotate_z.clicked.connect(lambda: self.turn_model_oz(self.angle))
+        self.rotate_z_.clicked.connect(lambda: self.turn_model_oz(-self.angle))
         # TODO: кастомизировать кнопки поворота
+
+        self.right.clicked.connect(lambda: self.rotate_side('right'))
 
     def load_model(self):
         self.scaleSlider.setValue(10)
@@ -47,13 +50,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print('Another model')
 
     def paintEvent(self, event):
-        painter = QPainter()
+        painter = QtDrawer()
         painter.begin(self)
 
+        self.model.draw_model(painter)
+
+        '''
         invisible_sides, inside_invisible_edges = self.model.get_invisible_sides(self.model.sides,
                                                                                  self.model.sides_edges,
                                                                                  self.model.inside_sides_edges)
         self.model.draw_model(painter, invisible_sides, inside_invisible_edges)
+        '''
         painter.end()
 
     def scale_model(self):
@@ -102,14 +109,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         dx, dy = sign(x1 - self.x) * 3, sign(self.y - y1) * 3
 
         modifiers = QtWidgets.QApplication.keyboardModifiers()
+
         if modifiers == QtCore.Qt.ShiftModifier:
             self.model.turn_model_oz(radians(dx))
-            self.update()
         elif event.buttons() == QtCore.Qt.RightButton:
             if dx:
                 self.model.turn_model_oy(radians(dx))
             if dy:
                 self.turn_model_ox(radians(dy))
-            self.update()
 
         self.x, self.y = x1, y1
+
+    def rotate_side(self, name):
+        print('rotate_side')

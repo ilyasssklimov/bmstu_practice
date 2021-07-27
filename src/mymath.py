@@ -25,6 +25,7 @@ class Vector:
     def get_vector(self):
         return [self.x, self.y, self.z]
 
+    '''
     def get_normal(self):  # , start_2, finish_2):
         if self.x:
             normal = Vector(Point(1, 0, 0), Point(-self.y / self.x, 1, 0))
@@ -35,6 +36,7 @@ class Vector:
         #     normal.negative()
 
         return normal
+    '''
 
 
 def radians(angle):
@@ -54,10 +56,12 @@ def sign(num):
         return 0
 
 
-def remove_repeats(points_1, points_2):
+def add_repeats(points_1, points_2):
     general = list(set(points_1) & set(points_2))
     return points_1 + points_2 + general
 
 
+'''
 def scalar_multiplication(vector_1, vector_2):
     return vector_1.x * vector_2.x + vector_1.y * vector_2.y + vector_1.z * vector_2.z
+'''
