@@ -1,8 +1,87 @@
-from mymath import Vector
+from mymath import Vector, sin_deg, cos_deg
 from point import Point
 
 
-class Matrix3d:
+class MatrixTransform:
+    def __init__(self):
+        self.size = 4
+        self.matrix = [[0.0 for _ in range(self.size)] for _ in range(self.size)]
+
+    def __str__(self):
+        result = ''
+        for i in range(self.size):
+            for j in range(self.size):
+                result += f'{self.matrix[i][j]:^10.1f}'
+            result += '\n'
+
+        return result
+
+    def transpose(self):
+        for i in range(self.size):
+            for j in range(i + 1):
+                self.matrix[i][j], self.matrix[j][i] = self.matrix[j][i], self.matrix[i][j]
+
+    def set_move(self, point):
+        for i in range(self.size):
+            for j in range(self.size):
+                self.matrix[i][j] = 0 if i != j else 1
+
+        self.matrix[0][self.size - 1] = point.x
+        self.matrix[1][self.size - 1] = point.y
+        self.matrix[2][self.size - 1] = point.z
+
+    def set_scale(self, k, point):
+        self.set_move(point)
+
+        for i in range(self.size - 1):
+            self.matrix[i][i] = k
+
+    def set_turn_ox(self, angle, point):
+        self.set_move(point)
+
+        self.matrix[1][1] = cos_deg(angle)
+        self.matrix[1][2] = -sin_deg(angle)
+        self.matrix[2][1] = sin_deg(angle)
+        self.matrix[2][2] = cos_deg(angle)
+
+    def set_turn_oy(self, angle, point):
+        self.set_move(point)
+
+        self.matrix[0][0] = cos_deg(angle)
+        self.matrix[0][2] = sin_deg(angle)
+        self.matrix[2][0] = -sin_deg(angle)
+        self.matrix[2][2] = cos_deg(angle)
+
+    def set_turn_oz(self, angle, point):
+        self.set_move(point)
+
+        self.matrix[0][0] = cos_deg(angle)
+        self.matrix[0][1] = -sin_deg(angle)
+        self.matrix[1][0] = sin_deg(angle)
+        self.matrix[1][1] = cos_deg(angle)
+
+    def set_transpose_move(self, point):
+        self.set_move(point)
+        self.transpose()
+
+    def set_transpose_scale(self, k, point):
+        self.set_scale(k, point)
+        self.transpose()
+
+    def set_transpose_turn_ox(self, angle, point):
+        self.set_turn_ox(angle, point)
+        self.transpose()
+
+    def set_transpose_turn_oy(self, angle, point):
+        self.set_turn_oy(angle, point)
+        self.transpose()
+
+    def set_transpose_turn_oz(self, angle, point):
+        self.set_turn_oz(angle, point)
+        self.transpose()
+
+
+class MatrixPlane:
     def __init__(self, vector):
         self.matrix = []
         self.matrix.append(Vector(vector[4], Point(0, 0, 0)).get_vector())
@@ -10,13 +89,13 @@ class Matrix3d:
         self.matrix.append(Vector(vector[2], vector[3]).get_vector())
 
     def get_minor(self, i):
-        j = (i + 1) % 3
-        k = (i + 2) % 3
-        return self.matrix[1][j] * self.matrix[2][k] - self.matrix[2][j] * self.matrix[1][k]
+        minor_matrix = [self.matrix[j][:i] + self.matrix[j][i+1:] for j in range(1, 3)]
+        return minor_matrix[0][0] * minor_matrix[1][1] - minor_matrix[1][0] * minor_matrix[0][1]
 
     def get_determinant(self):
         result = []
         d = 0
+
         for i in range(3):
             minor = self.get_minor(i)
             result.append(minor)
@@ -28,13 +107,15 @@ class Matrix3d:
 
 class MatrixBody:
     def __init__(self, coefficients):
-        self.coefficients = coefficients
+        self.sides = coefficients.keys()
+        self.coefficients = list(coefficients.values())
+        self.size = len(self.coefficients)
 
     def __str__(self):
         result = ''
-        for i in range(len(self.coefficients)):
-            for j in range(4):
-                result += f'{self.coefficients[i][j]:^10.1f}'
+        for i in range(len(self.coefficients[0])):
+            for j in range(self.size):
+                result += f'{self.coefficients[j][i]:^10.1f}'
             result += '\n'
 
         return result
@@ -42,24 +123,34 @@ class MatrixBody:
     def negative(self, i):
         self.coefficients[i] = [-coefficient for coefficient in self.coefficients[i]]
 
-    def multiplication(self, vector):
+    def multiplication_vector(self, vector):
         result = []
-        for i in range(len(self.coefficients)):
-            tmp_result = 0
+
+        for i in range(self.size):
+            result.append(0)
             for j in range(len(vector)):
-                tmp_result += vector[j] * self.coefficients[i][j]
-            result.append(tmp_result)
+                result[i] += vector[j] * self.coefficients[i][j]
+
+        return result
+
+    def multiplication(self, matrix):
+        result = [[] for _ in range(self.size)]
+        size = len(matrix[0])
+        # TODO: ошибка если длины разные
+
+        for i in range(len(matrix)):
+            for j in range(self.size):
+                result[j].append(0)
+                for k in range(size):
+                    result[j][i] += matrix[i][k] * self.coefficients[j][k]
 
         return result
 
     def adjust(self, point):
-        result = self.multiplication(point)
+        result = self.multiplication_vector(point)
         for i in range(len(result)):
             if result[i] > 0:
                 self.negative(i)
 
-    def transform(self):
-        pass
-
-    def scale(self):
-        pass
+    def transform(self, matrix):
+        self.coefficients = self.multiplication(matrix)

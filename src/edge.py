@@ -4,10 +4,19 @@ class Edge:
         self.second = second
 
     def __str__(self):
-        return f'{self.first}, {self.second}'
+        return f'Edge({self.first}, {self.second})'
+
+    def __repr__(self):
+        return str(self)
 
     def get_points(self, vertices):
         return [vertices[self.first], vertices[self.second]]
 
     def __contains__(self, item):
-        return item in self.first or item in self.second
+        if isinstance(item, list):
+            for i in item:
+                if i in self.first and i in self.second:
+                    return True
+            return False
+        else:
+            return item in self.first and item in self.second

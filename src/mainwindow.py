@@ -2,7 +2,7 @@ from config import Config
 from design import Ui_MainWindow
 from drawer import QtDrawer
 from models import Model, Cube
-from mymath import radians, sign
+from mymath import sign
 from point import Point
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPainter
@@ -14,7 +14,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.model = None
         self.k = 10
-        self.angle = radians(15)
+        self.angle = 15
+        self.speed = 2
         self.load_model()
 
         self.x = 0
@@ -43,8 +44,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
             self.model = Cube()
-            self.model.turn_model_oy(radians(45))
-            self.model.turn_model_ox(radians(-30))
+            # self.model.turn_model_oy(45)
+            # self.model.turn_model_ox(-30)
             self.update()
         else:
             print('Another model')
@@ -106,17 +107,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def mouseMoveEvent(self, event):
         x1, y1 = event.x(), event.y()
-        dx, dy = sign(x1 - self.x) * 3, sign(self.y - y1) * 3
+        dx, dy = sign(x1 - self.x) * self.speed, sign(self.y - y1) * self.speed
 
         modifiers = QtWidgets.QApplication.keyboardModifiers()
 
         if modifiers == QtCore.Qt.ShiftModifier:
-            self.model.turn_model_oz(radians(dx))
+            self.turn_model_oz(dx)
         elif event.buttons() == QtCore.Qt.RightButton:
             if dx:
-                self.model.turn_model_oy(radians(dx))
+                self.turn_model_oy(dx)
             if dy:
-                self.turn_model_ox(radians(dy))
+                self.turn_model_ox(dy)
 
         self.x, self.y = x1, y1
 

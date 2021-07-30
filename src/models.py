@@ -1,11 +1,10 @@
 from collections import Counter
 from config import Config, CubeConfig
-from edge import Edge
 from elements import CubeCarcass, CubeSides, CubeEdges
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
-from matrix import Matrix3d, MatrixBody
+from matrix import MatrixPlane, MatrixBody, MatrixTransform
 
 
 class Model:
@@ -14,13 +13,7 @@ class Model:
         self.carcass = carcass
         self.sides = sides
         self.edges = edges
-        self.matrix_body = self.get_matrix_body(self.carcass.create_plane_points())
-        '''
-        self.vertices = vertices
-        self.edges = edges
-        self.inside_vertices = inside_vertices
-        self.inside_edges = inside_edges
-        '''
+
         self.k = 1
 
         cfg = Config()
@@ -30,11 +23,25 @@ class Model:
         self.matrix_center = [dx, dy, dz, 1]
         self.viewer = [dx, dy, 1000000, 0]
 
+        self.matrix_body = None
+        self.set_matrix_body()
+
+        # self.transform_matrix = MatrixTransform()
+        self.visible_sides = []
+        '''
+        self.vertices = vertices
+        self.edges = edges
+        self.inside_vertices = inside_vertices
+        self.inside_edges = inside_edges
+        '''
+
     def draw_model(self, painter):
-        pen = QPen(Qt.black, 4)
+        pen = QPen(Qt.black, 2)
         painter.setPen(pen)
-        self.carcass.draw(painter)
-        self.sides.draw(painter)
+
+        self.set_visible_sides()
+        self.carcass.draw(painter, self.visible_sides)
+        self.sides.draw(painter, self.visible_sides)
         '''
         for i, edge in enumerate(self.edges):
             if i not in invisible_sides:
@@ -54,10 +61,6 @@ class Model:
         self.carcass.scale(tmp, self.center)
         self.sides.scale(tmp, self.center)
 
-        '''
-        for i in range(len(self.inside_vertices)):
-            self.inside_vertices[i].scale(tmp, Point(self.dx, self.dy, self.dz))
-        '''
         self.k = k
 
     def move_model(self, point):
@@ -88,24 +91,31 @@ class Model:
 
         self.move_model(self.center)
 
-    def get_matrix_body(self, sides):
-        coefficients = []
+    def set_matrix_body(self):
+        sides = self.carcass.create_plane_points()
+        coefficients = {}
 
-        for side in sides:
-            plane = Matrix3d(side)
-            coefficients.append(plane.get_determinant())
+        for key, value in sides.items():
+            plane = MatrixPlane(value)
+            coefficients[key] = plane.get_determinant()
 
-        matrix_body = MatrixBody(coefficients)
-        matrix_body.adjust(self.matrix_center)
+        self.matrix_body = MatrixBody(coefficients)
 
-        return matrix_body
+        # TODO: понять, почему не работает
+        # self.matrix_body.adjust(self.matrix_center)  # ???
 
-    def get_invisible_sides(self):
-        result = self.matrix_body.multiplication(self.viewer)
+    def set_visible_sides(self):
+        self.set_matrix_body()
+        result = self.matrix_body.multiplication_vector(self.viewer)
+        sides = self.matrix_body.sides
+        # sides_edges = self.carcass.sides
 
-        sides_edges = self.carcass.get_sides()
-        invisible_sides = [number for side, value in zip(sides_edges, result) if value < 0 for number in side]
-        invisible_sides = [key for key, value in Counter(invisible_sides).items() if value > 1]
+        self.visible_sides = [side for side, value in zip(sides, result) if value >= 0]
+
+        # for side, value in zip(sides_edges, result):
+
+        # invisible_sides = [number for side, value in zip(sides_edges, result) if value < 0 for number in side]
+        # invisible_sides = [key for key, value in Counter(invisible_sides).items() if value > 1]
         # inside_invisible_sides = [list(side) for side, value in zip(inside_sides_edges, result) if value < 0]
 
         # invisible_edges = []
@@ -118,7 +128,7 @@ class Model:
         # for side in inside_invisible_sides:
         #     inside_invisible_edges.extend(side)
 
-        return invisible_sides # , inside_invisible_edges
+        # return visible_sides  # , inside_invisible_edges
 
 
 class Cube(Model):

@@ -1,5 +1,4 @@
-from math import pi
-from point import Point
+from math import pi, sin, cos
 
 
 class Vector:
@@ -45,6 +44,14 @@ def radians(angle):
 
 def degrees(angle):
     return angle * 180 / pi
+
+
+def sin_deg(angle):
+    return sin(radians(angle))
+
+
+def cos_deg(angle):
+    return cos(radians(angle))
 
 
 def sign(num):

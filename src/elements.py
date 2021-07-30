@@ -10,11 +10,14 @@ class CubeCarcass:
         dx, dy, dz = cfg.dx, cfg.dy, cfg.dz
         self.vertices = {k: Point(v[0] + dx, v[1] + dy, v[2] + dz) for k, v in vertices.items()}
         self.edges = [Edge(edge[0], edge[1]) for edge in edges]
+        self.sides = self.set_sides()
 
-    def draw(self, painter):
+    def draw(self, painter, visible_sides):
+        print(visible_sides)
         for edge in self.edges:
-            start, finish = self.vertices[edge.first], self.vertices[edge.second]
-            painter.create_line(start.x, start.y, finish.x, finish.y)
+            if visible_sides in edge:
+                start, finish = self.vertices[edge.first], self.vertices[edge.second]
+                painter.create_line(start.x, start.y, finish.x, finish.y)
 
     def get_edges_vertices(self, name):
         vertices = {k: v for k, v in self.vertices.items() if name in k}
@@ -40,18 +43,22 @@ class CubeCarcass:
         self.transform(lambda key: self.vertices[key].turn_oz(angle))
 
     def create_plane_points(self):
-        points = []
+        points = {}
         sides = {'B': (0, 3), 'U': (0, 4), 'R': (1, 5), 'D': (2, 6), 'L': (3, 7), 'F': (8, 9)}
 
-        for side in sides.values():
-            points.append(add_repeats(
-                self.edges[side[0]].get_points(self.vertices),
-                self.edges[side[1]].get_points(self.vertices)))
+        for key, value in sides.items():
+            points[key] = add_repeats(self.edges[value[0]].get_points(self.vertices),
+                                      self.edges[value[1]].get_points(self.vertices))
 
         return points
 
-    def get_sides(self):
-        return [(0, 1, 2, 3), (0, 4, 8, 5), (1, 5, 9, 6), (2, 6, 10, 7), (3, 7, 11, 4), (8, 9, 10, 11)]
+    def set_sides(self):
+        result = {}
+        sides = ['U', 'D', 'L', 'R', 'F', 'B']
+
+        for name in sides:
+            result[name] = [edge for edge in self.edges if name in edge]
+        return result
 
 
 class CubeSide:
@@ -94,19 +101,13 @@ class CubeSides:
                     for k, v in vertices.items()}
         edges = [Edge(edge[0], edge[1]) for edge in edges]
 
-        self.sides = {
-            'R': CubeSide(vertices, edges, 'R'),
-            'L': CubeSide(vertices, edges, 'L'),
-            'U': CubeSide(vertices, edges, 'U'),
-            'D': CubeSide(vertices, edges, 'D'),
-            'F': CubeSide(vertices, edges, 'F'),
-            'B': CubeSide(vertices, edges, 'B')
-        }
-
         self.changes = config.CubeConfig().changes
+        self.sides = {}
+        for name in self.changes.keys():
+            self.sides[name] = CubeSide(vertices, edges, name)
 
-    def draw(self, painter):
-        for side in self.sides:
+    def draw(self, painter, visible_sides):
+        for side in visible_sides:
             self.sides[side].draw(painter)
 
     def get_edges_vertices(self, name):
@@ -187,3 +188,4 @@ class CubeEdges:
     def get_vertices(self, carcass, sides, name):
         self.vertices = carcass.get_edges_vertices(name)
         self.vertices.update(sides.get_edges_vertices(name))
+    

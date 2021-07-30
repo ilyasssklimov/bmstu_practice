@@ -1,4 +1,4 @@
-from math import sin, cos
+from mymath import sin_deg, cos_deg
 
 
 class Point:
@@ -8,7 +8,10 @@ class Point:
         self.z = z
 
     def __str__(self):
-        return f'({self.x}, {self.y}, {self.z})'
+        return f'Point({self.x}, {self.y}, {self.z})'
+
+    def __repr__(self):
+        return str(self)
 
     def __sub__(self, other):
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
@@ -28,15 +31,15 @@ class Point:
 
     def turn_ox(self, angle):
         y, z = self.y, self.z
-        self.y = y * cos(angle) - z * sin(angle)
-        self.z = y * sin(angle) + z * cos(angle)
+        self.y = y * cos_deg(angle) - z * sin_deg(angle)
+        self.z = y * sin_deg(angle) + z * cos_deg(angle)
 
     def turn_oy(self, angle):
         x, z = self.x, self.z
-        self.x = x * cos(angle) + z * sin(angle)
-        self.z = -x * sin(angle) + z * cos(angle)
+        self.x = x * cos_deg(angle) + z * sin_deg(angle)
+        self.z = -x * sin_deg(angle) + z * cos_deg(angle)
 
     def turn_oz(self, angle):
         x, y = self.x, self.y
-        self.x = x * cos(angle) - y * sin(angle)
-        self.y = x * sin(angle) + y * cos(angle)
+        self.x = x * cos_deg(angle) - y * sin_deg(angle)
+        self.y = x * sin_deg(angle) + y * cos_deg(angle)

@@ -1,8 +1,3 @@
-from edge import Edge
-from point import Point
-from elements import CubeCarcass, CubeSides, CubeEdges
-
-
 # TODO: возможно убрать классы и сделать "голые" данные
 
 
