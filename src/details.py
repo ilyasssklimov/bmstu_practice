@@ -101,9 +101,9 @@ class CubeSides:
                     for k, v in vertices.items()}
         edges = [Edge(edge[0], edge[1]) for edge in edges]
 
-        self.changes = config.CubeConfig().changes
+        self.additions = config.CubeConfig().additions
         self.sides = {}
-        for name in self.changes.keys():
+        for name in self.additions:
             self.sides[name] = CubeSide(vertices, edges, name)
 
     def draw(self, painter, visible_sides):
@@ -111,12 +111,11 @@ class CubeSides:
             self.sides[side].draw(painter)
 
     def get_edges_vertices(self, name):
-        change = self.changes[name]
+        addition = self.additions[name]
 
         vertices = {k: v for k, v in self.sides[name].vertices.items() if name in k}
-        for i in range(2, 8, 2):
-            for j in range(4):
-                vertices[f'{change[i]}0{i}'] = self.sides[change[i]].vertices[f'{change[i]}0{i}']
+        for vertex in addition:
+            vertices[vertex] = self.sides[vertex[0]].vertices[vertex]
 
         '''
         edges = [edge for edge in self.sides[name].edges if name in edge]
@@ -184,8 +183,83 @@ class CubeEdge:
 class CubeEdges:
     def __init__(self):
         self.vertices = None
+        self.angle = config.CubeConfig().angle
 
-    def get_vertices(self, carcass, sides, name):
+    def set_vertices(self, carcass, sides, name):
         self.vertices = carcass.get_edges_vertices(name)
         self.vertices.update(sides.get_edges_vertices(name))
-    
+
+    def get_side_center(self, name):
+        cfg = config.Config()
+        center = Point(cfg.dx, cfg.dy, cfg.dz)
+        print(center)
+        axis = config.CubeConfig().exchange_axis[name]
+        center.add_by_axis(axis, 2 / 3 * cfg.size)
+        return center
+
+    def turn_edge(self, name):
+        def func(point):
+            axis = config.CubeConfig().exchange_axis[name]
+            if 'x' in axis:
+                return point.turn_ox(self.angle)
+            elif 'y' in axis:
+                return point.turn_oy(self.angle)
+            elif 'z' in axis:
+                return point.turn_oz(self.angle)
+
+        center = self.get_side_center(name)
+        turn = func
+
+        for key in self.vertices:
+            self.vertices[key].move(-center)
+            turn(self.vertices[key])
+            self.vertices[key].move(center)
+
+        print(f'{center = }')
+
+
+# NEW_PART -----------------------------------------------------------------
+
+
+class Detail:
+    def __init__(self, vertices, edges):
+        self.vertices = vertices
+        self.edges = edges
+
+    def turn_detail(self, angle):
+        for vertex in self.vertices:
+            vertex.turn_ox(angle.x)
+            vertex.turn_oy(angle.y)
+            vertex.turn_oz(angle.z)
+
+    def move_detail(self, offset):
+        for vertex in self.vertices:
+            vertex.move(offset)
+
+
+class Corner(Detail):
+    def __init__(self, vertices, edges, angle, offset):
+        super().__init__(vertices, edges)
+        self.turn_detail(angle)
+        self.move_detail(offset)
+
+
+class Corners:
+    def __init__(self):
+        pass
+
+
+class Rib(Detail):
+    pass
+
+
+class Ribs:
+    pass
+
+
+class Center(Detail):
+    pass
+
+
+class Centers:
+    pass

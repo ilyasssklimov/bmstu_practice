@@ -43,3 +43,19 @@ class Point:
         x, y = self.x, self.y
         self.x = x * cos_deg(angle) - y * sin_deg(angle)
         self.y = x * sin_deg(angle) + y * cos_deg(angle)
+
+    def add_by_axis(self, axis, value):
+        if '-' in axis:
+            value *= -1
+
+        if 'x' in axis:
+            self.x += value
+        elif 'y' in axis:
+            self.y += value
+        elif 'z' in axis:
+            self.z += value
+
+
+class Angle(Point):
+    def __init__(self, ox, oy, oz):
+        super().__init__(ox, oy, oz)

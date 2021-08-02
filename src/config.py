@@ -11,7 +11,7 @@ class Config:
         self.dz = 0
 
 
-class CubeConfig:
+class _CubeConfig:
     def __init__(self):
         size = Config().size
 
@@ -163,15 +163,42 @@ class CubeConfig:
                 (f'{letter}06', f'{letter}14')
             ])
 
-        self.changes = {
-            'R': ('F', 'U', 'B', 'D'),
-            'L': ('B', 'U', 'F', 'D'),
-            'F': ('L', 'U', 'R', 'D'),
-            'B': ('R', 'U', 'L', 'D'),
-            'U': ('L', 'F', 'R', 'B'),
-            'D': ('R', 'F', 'L', 'B')
+        self.additions = {
+            'R': ('F02', 'F04', 'F06',
+                  'U02', 'U04', 'U06',
+                  'B05', 'B03', 'B01',
+                  'D02', 'D04', 'D06'),
+            'L': ('F01', 'F03', 'F05',
+                  'U01', 'U03', 'U05',
+                  'B06', 'B04', 'B02',
+                  'D01', 'D03', 'D05'),
+            'F': ('L02', 'L04', 'L06',
+                  'U11', 'U03', 'U04',
+                  'R05', 'R03', 'R01',
+                  'D06', 'D05', 'D12'),
+            'B': ('L01', 'L03', 'L05',
+                  'U12', 'U05', 'U06',
+                  'R06', 'R04', 'R02',
+                  'D04', 'D03', 'D11'),
+            'U': ('F12', 'F05', 'F06',
+                  'R12', 'R05', 'R06',
+                  'B12', 'B05', 'B06',
+                  'L12', 'L05', 'L06'),
+            'D': ('F11', 'F03', 'F04',
+                  'R11', 'R03', 'R04',
+                  'B11', 'B03', 'B04',
+                  'L11', 'L03', 'L04')
         }
 
+        self.angle = 10
+        self.exchange_axis = {
+            'R': 'x',
+            'L': '-x',
+            'U': '-y',
+            'D': 'y',
+            'F': 'z',
+            'B': '-z'
+        }
         '''
         self.colors = {
             'R': 'red',
@@ -182,3 +209,79 @@ class CubeConfig:
             'D': 'green'
         }
         '''
+
+
+# NEW_PART ----------------------------------------------
+
+
+class CubeConfig:
+    def __init__(self, n):
+        self.n = n
+        self.size = Config().size / self.n
+
+    def get_center_data(self):
+        vertices = [
+            (-self.size, self.size, self.size),
+            (-self.size, -self.size, self.size),
+            (self.size, -self.size, self.size),
+            (self.size, self.size, self.size)
+        ]
+
+        edges = [
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 0)
+        ]
+
+        return vertices, edges
+
+    def get_eccentric_data(self):
+        vertices = [
+            (-self.size, self.size, self.size),
+            (-self.size, -self.size, self.size),
+            (self.size, -self.size, self.size),
+            (self.size, self.size, self.size),
+
+            (-self.size, self.size, -self.size),
+            (-self.size, -self.size, -self.size),
+            (self.size, -self.size, -self.size),
+            (self.size, self.size, -self.size),
+        ]
+
+        edges = [
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 0),
+
+            (0, 4),
+            (1, 5),
+            (2, 6),
+            (3, 7),
+
+            (4, 5),
+            (5, 6),
+            (6, 7),
+            (7, 0)
+        ]
+
+        return vertices, edges
+
+    def get_offset_corners(self):
+        offset = Config().size * (self.n - 1) / self.n
+        positions = {
+            'LFD': (-offset, offset, offset),
+            'LFU': (-offset, -offset, offset),
+            'RFU': (offset, -offset, offset),
+            'RFD': (offset, offset, offset),
+
+            'LBD': (-offset, offset, -offset),
+            'LBU': (-offset, -offset, -offset),
+            'RBU': (offset, -offset, -offset),
+            'RBD': (offset, offset, -offset)
+        }
+
+        return positions
+
+

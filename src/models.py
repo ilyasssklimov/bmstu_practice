@@ -1,6 +1,6 @@
 from collections import Counter
 from config import Config, CubeConfig
-from elements import CubeCarcass, CubeSides, CubeEdges
+from details import CubeCarcass, CubeSides, CubeEdges
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
@@ -36,23 +36,15 @@ class Model:
         '''
 
     def draw_model(self, painter):
+        self.set_visible_sides()
+
+        pen = QPen(Qt.black, 4)
+        painter.setPen(pen)
+        self.carcass.draw(painter, self.visible_sides)
+
         pen = QPen(Qt.black, 2)
         painter.setPen(pen)
-
-        self.set_visible_sides()
-        self.carcass.draw(painter, self.visible_sides)
-        self.sides.draw(painter, self.visible_sides)
-        '''
-        for i, edge in enumerate(self.edges):
-            if i not in invisible_sides:
-                start, finish = self.vertices[edge.first], self.vertices[edge.second]
-                painter.drawLine(start.x, start.y, finish.x, finish.y)
-
-        for i, edge in enumerate(self.inside_edges):
-            if i not in inside_invisible_sides:
-                start, finish = self.inside_vertices[edge.first], self.inside_vertices[edge.second]
-                painter.drawLine(start.x, start.y, finish.x, finish.y)
-        '''
+        # self.sides.draw(painter, self.visible_sides)
 
     def scale_model(self, k):
         k = k if k else 1
@@ -129,6 +121,10 @@ class Model:
         #     inside_invisible_edges.extend(side)
 
         # return visible_sides  # , inside_invisible_edges
+
+    def turn_edge(self, name):
+        self.edges.set_vertices(self.carcass, self.sides, name)
+        self.edges.turn_edge(name)
 
 
 class Cube(Model):

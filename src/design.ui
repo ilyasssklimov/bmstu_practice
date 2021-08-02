@@ -227,6 +227,60 @@
      <string>R</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="right_">
+    <property name="geometry">
+     <rect>
+      <x>1210</x>
+      <y>320</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>R'</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="up">
+    <property name="geometry">
+     <rect>
+      <x>1170</x>
+      <y>280</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>U</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="front">
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>280</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>F</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

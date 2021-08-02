@@ -34,7 +34,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.rotate_z_.clicked.connect(lambda: self.turn_model_oz(-self.angle))
         # TODO: кастомизировать кнопки поворота
 
-        self.right.clicked.connect(lambda: self.rotate_side('right'))
+        self.right.clicked.connect(lambda: self.turn_edge('R'))
+        self.up.clicked.connect(lambda: self.turn_edge('U'))
+        self.front.clicked.connect(lambda: self.turn_edge('F'))
 
     def load_model(self):
         self.scaleSlider.setValue(10)
@@ -121,5 +123,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.x, self.y = x1, y1
 
-    def rotate_side(self, name):
-        print('rotate_side')
+    def turn_edge(self, name):
+        self.model.turn_edge(name)
+        self.update()
