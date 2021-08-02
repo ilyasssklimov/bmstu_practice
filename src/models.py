@@ -1,6 +1,6 @@
 from collections import Counter
 from config import Config, CubeConfig
-from details import CubeCarcass, CubeSides, CubeEdges
+from details import Corners, Ribs
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
@@ -9,11 +9,12 @@ from matrix import MatrixPlane, MatrixBody, MatrixTransform
 
 class Model:
     # TODO: добавить матрицы преобразований (и для координат, и для матрицы тела)
-    def __init__(self, carcass, sides, edges):
-        self.carcass = carcass
-        self.sides = sides
-        self.edges = edges
-
+    def __init__(self, corners, ribs):
+        # self.carcass = carcass
+        # self.sides = sides
+        # self.edges = edges
+        self.corners = corners
+        self.ribs = ribs
         self.k = 1
 
         cfg = Config()
@@ -40,50 +41,54 @@ class Model:
 
         pen = QPen(Qt.black, 4)
         painter.setPen(pen)
-        self.carcass.draw(painter, self.visible_sides)
+        self.corners.draw(painter)
+        self.ribs.draw(painter)
+        # self.carcass.draw(painter, self.visible_sides)
 
-        pen = QPen(Qt.black, 2)
-        painter.setPen(pen)
+        # pen = QPen(Qt.black, 2)
+        # painter.setPen(pen)
         # self.sides.draw(painter, self.visible_sides)
 
     def scale_model(self, k):
         k = k if k else 1
         tmp = k / self.k
 
-        self.carcass.scale(tmp, self.center)
-        self.sides.scale(tmp, self.center)
+        # self.carcass.scale(tmp, self.center)
+        # self.sides.scale(tmp, self.center)
 
         self.k = k
 
     def move_model(self, point):
-        self.carcass.move(point)
-        self.sides.move(point)
+        pass
+        # self.carcass.move(point)
+        # self.sides.move(point)
 
     def turn_model_ox(self, angle):
         self.move_model(-self.center)
 
-        self.carcass.turn_ox(angle)
-        self.sides.turn_ox(angle)
+        # self.carcass.turn_ox(angle)
+        # self.sides.turn_ox(angle)
 
         self.move_model(self.center)
 
     def turn_model_oy(self, angle):
         self.move_model(-self.center)
 
-        self.carcass.turn_oy(angle)
-        self.sides.turn_oy(angle)
+        # self.carcass.turn_oy(angle)
+        # self.sides.turn_oy(angle)
 
         self.move_model(self.center)
 
     def turn_model_oz(self, angle):
         self.move_model(-self.center)
 
-        self.carcass.turn_oz(angle)
-        self.sides.turn_oz(angle)
+        # self.carcass.turn_oz(angle)
+        # self.sides.turn_oz(angle)
 
         self.move_model(self.center)
 
     def set_matrix_body(self):
+        '''
         sides = self.carcass.create_plane_points()
         coefficients = {}
 
@@ -92,17 +97,18 @@ class Model:
             coefficients[key] = plane.get_determinant()
 
         self.matrix_body = MatrixBody(coefficients)
-
+        '''
+        pass
         # TODO: понять, почему не работает
         # self.matrix_body.adjust(self.matrix_center)  # ???
 
     def set_visible_sides(self):
         self.set_matrix_body()
-        result = self.matrix_body.multiplication_vector(self.viewer)
-        sides = self.matrix_body.sides
+        # result = self.matrix_body.multiplication_vector(self.viewer)
+        # sides = self.matrix_body.sides
         # sides_edges = self.carcass.sides
 
-        self.visible_sides = [side for side, value in zip(sides, result) if value >= 0]
+        # self.visible_sides = [side for side, value in zip(sides, result) if value >= 0]
 
         # for side, value in zip(sides_edges, result):
 
@@ -123,18 +129,21 @@ class Model:
         # return visible_sides  # , inside_invisible_edges
 
     def turn_edge(self, name):
-        self.edges.set_vertices(self.carcass, self.sides, name)
-        self.edges.turn_edge(name)
+        pass
+        # self.edges.set_vertices(self.carcass, self.sides, name)
+        # self.edges.turn_edge(name)
 
 
 class Cube(Model):
-    def __init__(self):
-        cfg = CubeConfig()
-        carcass = CubeCarcass(cfg.vertices, cfg.carcass_edges)
-        sides = CubeSides(cfg.inner_vertices, cfg.sides, carcass)
-        edges = CubeEdges()
+    def __init__(self, n):
+        corners = Corners(n)
+        ribs = Ribs(n)
+        # cfg = CubeConfig()
+        # carcass = CubeCarcass(cfg.vertices, cfg.carcass_edges)
+        # sides = CubeSides(cfg.inner_vertices, cfg.sides, carcass)
+        # edges = CubeEdges()
 
-        super().__init__(carcass, sides, edges)
+        super().__init__(corners, ribs)
 
         '''
         vertices = CubeConfig().vertices

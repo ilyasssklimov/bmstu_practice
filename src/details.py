@@ -1,9 +1,9 @@
 import config
-from edge import Edge
-from mymath import add_repeats
+from copy import deepcopy
 from point import Point
 
 
+'''
 class CubeCarcass:
     def __init__(self, vertices, edges):
         cfg = config.Config()
@@ -116,8 +116,8 @@ class CubeSides:
         vertices = {k: v for k, v in self.sides[name].vertices.items() if name in k}
         for vertex in addition:
             vertices[vertex] = self.sides[vertex[0]].vertices[vertex]
-
-        '''
+'''
+'''
         edges = [edge for edge in self.sides[name].edges if name in edge]
         for i in range(4):
             edges.extend([
@@ -125,10 +125,11 @@ class CubeSides:
                 Edge(f'{change[i]}04', f'{change[i]}06'),
                 Edge(f'{change[i]}06', f'{change[(i + 1) % 4]}02')
             ])
-        '''
+
 
         return vertices
-
+'''
+'''
     def transform(self, func):
         for side in self.sides:
             func(side)
@@ -147,7 +148,7 @@ class CubeSides:
 
     def turn_oz(self, angle):
         self.transform(lambda side: self.sides[side].turn_oz(angle))
-
+'''
 
 '''
 class CubeEdge:
@@ -179,7 +180,7 @@ class CubeEdge:
             ])
 '''
 
-
+'''
 class CubeEdges:
     def __init__(self):
         self.vertices = None
@@ -216,6 +217,7 @@ class CubeEdges:
             self.vertices[key].move(center)
 
         print(f'{center = }')
+'''
 
 
 # NEW_PART -----------------------------------------------------------------
@@ -226,35 +228,68 @@ class Detail:
         self.vertices = vertices
         self.edges = edges
 
-    def turn_detail(self, angle):
+    def turn(self, angle):
         for vertex in self.vertices:
             vertex.turn_ox(angle.x)
             vertex.turn_oy(angle.y)
             vertex.turn_oz(angle.z)
 
-    def move_detail(self, offset):
+    def move(self, offset):
         for vertex in self.vertices:
             vertex.move(offset)
 
+    def draw(self, painter):
+        for edge in self.edges:
+            start, finish = self.vertices[edge.first], self.vertices[edge.second]
+            painter.create_line(start.x, start.y, finish.x, finish.y)
+
 
 class Corner(Detail):
-    def __init__(self, vertices, edges, angle, offset):
+    def __init__(self, vertices, edges, offset):
         super().__init__(vertices, edges)
-        self.turn_detail(angle)
-        self.move_detail(offset)
+        self.move(offset)
+        self.move(config.Config().center)
 
 
 class Corners:
-    def __init__(self):
-        pass
+    def __init__(self, n):
+        cfg = config.CubeConfig(n)
+        vertices, edges = cfg.get_eccentric_data()
+        positions = cfg.get_offset_corners()
+
+        self.corners = {}
+        for key, value in positions.items():
+            self.corners[key] = Corner(deepcopy(vertices), edges, Point(*value))
+
+    def draw(self, painter):
+        for key in self.corners:
+            self.corners[key].draw(painter)
 
 
 class Rib(Detail):
-    pass
+    def __init__(self, vertices, edges, offset):
+        super().__init__(vertices, edges)
+        self.move(offset)
+        self.move(config.Config().center)
 
 
 class Ribs:
-    pass
+    def __init__(self, n):
+        cfg = config.CubeConfig(n)
+        vertices, edges = cfg.get_eccentric_data()
+        positions = cfg.get_offset_ribs()
+
+        self.ribs = {}
+        if n > 2:
+            for key, value in positions.items():
+                self.ribs[key] = []
+                for position in positions[key]:
+                    self.ribs[key].append(Rib(deepcopy(vertices), edges, Point(*position)))
+
+    def draw(self, painter):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.draw(painter)
 
 
 class Center(Detail):
