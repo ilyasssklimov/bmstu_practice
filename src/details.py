@@ -228,15 +228,25 @@ class Detail:
         self.vertices = vertices
         self.edges = edges
 
-    def turn(self, angle):
+    def turn_ox(self, angle):
         for vertex in self.vertices:
-            vertex.turn_ox(angle.x)
-            vertex.turn_oy(angle.y)
-            vertex.turn_oz(angle.z)
+            vertex.turn_ox(angle)
+
+    def turn_oy(self, angle):
+        for vertex in self.vertices:
+            vertex.turn_oy(angle)
+
+    def turn_oz(self, angle):
+        for vertex in self.vertices:
+            vertex.turn_oz(angle)
 
     def move(self, offset):
         for vertex in self.vertices:
             vertex.move(offset)
+
+    def scale(self, k, point):
+        for vertex in self.vertices:
+            vertex.scale(k, point)
 
     def draw(self, painter):
         for edge in self.edges:
@@ -269,6 +279,22 @@ class Corners:
         for key in self.corners:
             self.corners[key].move(point)
 
+    def turn_ox(self, angle):
+        for key in self.corners:
+            self.corners[key].turn_ox(angle)
+
+    def turn_oy(self, angle):
+        for key in self.corners:
+            self.corners[key].turn_oy(angle)
+
+    def turn_oz(self, angle):
+        for key in self.corners:
+            self.corners[key].turn_oz(angle)
+
+    def scale(self, k, point):
+        for key in self.corners:
+            self.corners[key].scale(k, point)
+
 
 class Rib(Detail):
     def __init__(self, vertices, edges, offset):
@@ -299,6 +325,26 @@ class Ribs:
             for rib in self.ribs[key]:
                 rib.move(point)
 
+    def turn_ox(self, angle):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.turn_ox(angle)
+
+    def turn_oy(self, angle):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.turn_oy(angle)
+
+    def turn_oz(self, angle):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.turn_oz(angle)
+
+    def scale(self, k, point):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.scale(k, point)
+
 
 class Center(Detail):
     def __init__(self, vertices, edges, offset):
@@ -328,3 +374,23 @@ class Centers:
         for key in self.centers:
             for center in self.centers[key]:
                 center.move(point)
+
+    def turn_ox(self, angle):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.turn_ox(angle)
+
+    def turn_oy(self, angle):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.turn_oy(angle)
+
+    def turn_oz(self, angle):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.turn_oz(angle)
+
+    def scale(self, k, point):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.scale(k, point)

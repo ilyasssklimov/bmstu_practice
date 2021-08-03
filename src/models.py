@@ -10,9 +10,6 @@ from matrix import MatrixPlane, MatrixBody, MatrixTransform
 class Model:
     # TODO: добавить матрицы преобразований (и для координат, и для матрицы тела)
     def __init__(self, corners, ribs, centers):
-        # self.carcass = carcass
-        # self.sides = sides
-        # self.edges = edges
         self.corners = corners
         self.ribs = ribs
         self.centers = centers
@@ -20,7 +17,7 @@ class Model:
 
         cfg = Config()
         dx, dy, dz = cfg.dx, cfg.dy, cfg.dz
-        self.center = Point(dx, dy, dz)
+        self.center_point = Point(dx, dy, dz)
 
         self.matrix_center = [dx, dy, dz, 1]
         self.viewer = [dx, dy, 1000000, 0]
@@ -55,8 +52,9 @@ class Model:
         k = k if k else 1
         tmp = k / self.k
 
-        # self.carcass.scale(tmp, self.center)
-        # self.sides.scale(tmp, self.center)
+        self.corners.scale(tmp, self.center_point)
+        self.ribs.scale(tmp, self.center_point)
+        self.centers.scale(tmp, self.center_point)
 
         self.k = k
 
@@ -66,28 +64,31 @@ class Model:
         self.centers.move(point)
 
     def turn_model_ox(self, angle):
-        self.move_model(-self.center)
+        self.move_model(-self.center_point)
 
-        # self.carcass.turn_ox(angle)
-        # self.sides.turn_ox(angle)
+        self.corners.turn_ox(angle)
+        self.ribs.turn_ox(angle)
+        self.centers.turn_ox(angle)
 
-        self.move_model(self.center)
+        self.move_model(self.center_point)
 
     def turn_model_oy(self, angle):
-        self.move_model(-self.center)
+        self.move_model(-self.center_point)
 
-        # self.carcass.turn_oy(angle)
-        # self.sides.turn_oy(angle)
+        self.corners.turn_oy(angle)
+        self.ribs.turn_oy(angle)
+        self.centers.turn_oy(angle)
 
-        self.move_model(self.center)
+        self.move_model(self.center_point)
 
     def turn_model_oz(self, angle):
-        self.move_model(-self.center)
+        self.move_model(-self.center_point)
 
-        # self.carcass.turn_oz(angle)
-        # self.sides.turn_oz(angle)
+        self.corners.turn_oz(angle)
+        self.ribs.turn_oz(angle)
+        self.centers.turn_oz(angle)
 
-        self.move_model(self.center)
+        self.move_model(self.center_point)
 
     def set_matrix_body(self):
         '''

@@ -311,7 +311,7 @@ class CubeConfig:
             (4, 5),
             (5, 6),
             (6, 7),
-            (7, 0)
+            (7, 4)
         ]
         edges = [Edge(*edge) for edge in edges]
 
