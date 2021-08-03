@@ -1,6 +1,6 @@
 from collections import Counter
 from config import Config, CubeConfig
-from details import Corners, Ribs
+from details import Corners, Ribs, Centers
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
@@ -9,12 +9,13 @@ from matrix import MatrixPlane, MatrixBody, MatrixTransform
 
 class Model:
     # TODO: добавить матрицы преобразований (и для координат, и для матрицы тела)
-    def __init__(self, corners, ribs):
+    def __init__(self, corners, ribs, centers):
         # self.carcass = carcass
         # self.sides = sides
         # self.edges = edges
         self.corners = corners
         self.ribs = ribs
+        self.centers = centers
         self.k = 1
 
         cfg = Config()
@@ -43,6 +44,7 @@ class Model:
         painter.setPen(pen)
         self.corners.draw(painter)
         self.ribs.draw(painter)
+        self.centers.draw(painter)
         # self.carcass.draw(painter, self.visible_sides)
 
         # pen = QPen(Qt.black, 2)
@@ -59,9 +61,9 @@ class Model:
         self.k = k
 
     def move_model(self, point):
-        pass
-        # self.carcass.move(point)
-        # self.sides.move(point)
+        self.corners.move(point)
+        self.ribs.move(point)
+        self.centers.move(point)
 
     def turn_model_ox(self, angle):
         self.move_model(-self.center)
@@ -138,12 +140,13 @@ class Cube(Model):
     def __init__(self, n):
         corners = Corners(n)
         ribs = Ribs(n)
+        centers = Centers(n)
         # cfg = CubeConfig()
         # carcass = CubeCarcass(cfg.vertices, cfg.carcass_edges)
         # sides = CubeSides(cfg.inner_vertices, cfg.sides, carcass)
         # edges = CubeEdges()
 
-        super().__init__(corners, ribs)
+        super().__init__(corners, ribs, centers)
 
         '''
         vertices = CubeConfig().vertices

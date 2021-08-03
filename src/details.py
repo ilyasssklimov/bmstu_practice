@@ -265,6 +265,10 @@ class Corners:
         for key in self.corners:
             self.corners[key].draw(painter)
 
+    def move(self, point):
+        for key in self.corners:
+            self.corners[key].move(point)
+
 
 class Rib(Detail):
     def __init__(self, vertices, edges, offset):
@@ -275,12 +279,11 @@ class Rib(Detail):
 
 class Ribs:
     def __init__(self, n):
-        cfg = config.CubeConfig(n)
-        vertices, edges = cfg.get_eccentric_data()
-        positions = cfg.get_offset_ribs()
-
         self.ribs = {}
         if n > 2:
+            cfg = config.CubeConfig(n)
+            vertices, edges = cfg.get_eccentric_data()
+            positions = cfg.get_offset_ribs()
             for key, value in positions.items():
                 self.ribs[key] = []
                 for position in positions[key]:
@@ -291,10 +294,37 @@ class Ribs:
             for rib in self.ribs[key]:
                 rib.draw(painter)
 
+    def move(self, point):
+        for key in self.ribs:
+            for rib in self.ribs[key]:
+                rib.move(point)
+
 
 class Center(Detail):
-    pass
+    def __init__(self, vertices, edges, offset):
+        super().__init__(vertices, edges)
+        self.move(offset)
+        self.move(config.Config().center)
 
 
 class Centers:
-    pass
+    def __init__(self, n):
+        self.centers = {}
+        if n > 2:
+            cfg = config.CubeConfig(n)
+            positions = cfg.get_offset_centers()
+            for key, value in positions.items():
+                vertices, edges = cfg.get_center_data(key)
+                self.centers[key] = []
+                for position in positions[key]:
+                    self.centers[key].append(Rib(deepcopy(vertices), edges, Point(*position)))
+
+    def draw(self, painter):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.draw(painter)
+
+    def move(self, point):
+        for key in self.centers:
+            for center in self.centers[key]:
+                center.move(point)

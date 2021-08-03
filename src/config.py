@@ -226,27 +226,47 @@ class CubeConfig:
         self.size = Config().size / self.n
 
     def get_center_data(self, name):
-        vertices = []
-        if name == 'R' or name == 'L':
+        if name == 'L':
             vertices = [
                 (-self.size, self.size, self.size),
                 (-self.size, -self.size, self.size),
                 (-self.size, -self.size, -self.size),
                 (-self.size, self.size, -self.size)
             ]
-        elif name == 'F' or name == 'B':
+        elif name == 'R':
+            vertices = [
+                (self.size, self.size, self.size),
+                (self.size, -self.size, self.size),
+                (self.size, -self.size, -self.size),
+                (self.size, self.size, -self.size)
+            ]
+        elif name == 'F':
             vertices = [
                 (-self.size, self.size, self.size),
                 (-self.size, -self.size, self.size),
                 (self.size, -self.size, self.size),
                 (self.size, self.size, self.size)
             ]
-        elif name == 'U' or name == 'D':
+        elif name == 'B':
+            vertices = [
+                (-self.size, self.size, -self.size),
+                (-self.size, -self.size, -self.size),
+                (self.size, -self.size, -self.size),
+                (self.size, self.size, -self.size)
+            ]
+        elif name == 'U':
             vertices = [
                 (-self.size, -self.size, -self.size),
                 (-self.size, -self.size, self.size),
                 (self.size, -self.size, self.size),
                 (self.size, -self.size, -self.size)
+            ]
+        elif name == 'D':
+            vertices = [
+                (-self.size, self.size, -self.size),
+                (-self.size, self.size, self.size),
+                (self.size, self.size, self.size),
+                (self.size, self.size, -self.size)
             ]
         else:
             raise SideNameError
@@ -347,7 +367,7 @@ class CubeConfig:
             positions['DB'].append((0, offset, -offset))
 
         n = (self.n - 2) // 2
-        step = Config().size / self.n
+        step = self.size
         t = 1 if not self.n % 2 else 2
 
         for i in range(n):
@@ -376,8 +396,20 @@ class CubeConfig:
         sides = ['R', 'L', 'U', 'D', 'F', 'B']
         positions = {side: [] for side in sides}
 
+        offset = Config().size * (self.n - 1) / self.n
         step = self.size
-        for i in range(n // 2 + 1):
-            for j in range(n // 2 + 1):
-                dx = (j * 2 + 1) * step
-                positions['F'].append(())
+        t = 1 if not self.n % 2 else 0
+
+        for i in range(-(n // 2), (n + 1) // 2):
+            dy = (i * 2 + t) * step
+            for j in range(-(n // 2), (n + 1) // 2):
+                dx = (j * 2 + t) * step
+
+                positions['F'].append((dx, dy, offset))
+                positions['B'].append((dx, dy, -offset))
+                positions['R'].append((offset, dy, dx))
+                positions['L'].append((-offset, dy, dx))
+                positions['U'].append((dx, -offset, dy))
+                positions['D'].append((dx, offset, dy))
+
+        return positions
