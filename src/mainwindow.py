@@ -1,11 +1,10 @@
 from config import Config
 from design import Ui_MainWindow
 from drawer import QtDrawer
-from models import Model, Cube
+from models import Cube
 from mymath import sign
 from point import Point
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtGui import QPainter
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -15,7 +14,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.model = None
         self.k = 10
         self.angle = 45
-        self.speed = 2
+        self.speed = 1
         self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
 
@@ -23,6 +22,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.y = 0
         self.cfg = Config()
         self.viewer = Point(self.cfg.dx, self.cfg.dy, self.cfg.dz)
+
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.turn_side)
+        self.duration = 0
+        self.turning_side = ''
+        self.turning_direction = 0
 
         self.loadButton.clicked.connect(self.load_model)
         self.scaleSlider.valueChanged.connect(self.scale_model)
@@ -36,12 +41,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.rotate_z_.clicked.connect(lambda: self.turn_model_oz(-self.angle))
         # TODO: кастомизировать кнопки поворота
 
-        self.right.clicked.connect(lambda: self.turn_edge('R', 10))
-        self.up.clicked.connect(lambda: self.turn_edge('U', 10))
-        self.front.clicked.connect(lambda: self.turn_edge('F', 10))
-        self.left.clicked.connect(lambda: self.turn_edge('L', 10))
-        self.down.clicked.connect(lambda: self.turn_edge('D', 10))
-        self.back.clicked.connect(lambda: self.turn_edge('B', 10))
+        self.right.clicked.connect(lambda: self.start_turning_side('R', 1))
+        self.up.clicked.connect(lambda: self.start_turning_side('U', 1))
+        self.front.clicked.connect(lambda: self.start_turning_side('F', 1))
+        self.left.clicked.connect(lambda: self.start_turning_side('L', 1))
+        self.down.clicked.connect(lambda: self.start_turning_side('D', 1))
+        self.back.clicked.connect(lambda: self.start_turning_side('B', 1))
 
     def load_model(self):
         self.scaleSlider.setValue(10)
@@ -51,8 +56,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
             self.model = Cube(int(self.sizeModel.currentText().split('x')[0]))
-            # self.model.turn_model_oy(45)
-            # self.model.turn_model_ox(-30)
+            self.model.turn_oy(45)
+            self.model.turn_ox(-30)
             self.update()
         else:
             print('Another model')
@@ -71,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.k < 1:
             self.k = 1
 
-        self.model.scale_model(self.k / 10)
+        self.model.scale(self.k / 10)
         self.update()
 
     def wheelEvent(self, event):
@@ -85,7 +90,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.k = 100
 
         self.scaleSlider.setValue(self.k)
-        self.model.scale_model(self.k / 10)
+        self.model.scale(self.k / 10)
         self.update()
 
     def turn_model_ox(self, angle):
@@ -120,6 +125,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.x, self.y = x1, y1
 
-    def turn_edge(self, name, angle):
-        self.model.turn_side(name, angle)
+    def set_turning_params(self, name, direction):
+        self.turning_side = name
+        self.turning_direction = direction
+
+    def start_turning_side(self, name, direction):
+        if self.duration == 0:
+            self.set_turning_params(name, direction)
+            self.timer.start(1)
+
+    def turn_side(self):
+        self.duration += 1
+        self.model.turn_side(self.turning_side, self.turning_direction)
         self.update()
+
+        if self.duration >= 90:
+            self.timer.stop()
+            self.duration = 0
+            self.update_sides()
+
+    def update_sides(self):
+        self.model.update_sides()

@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from point import Point
 from matrix import MatrixPlane, MatrixBody, MatrixTransform
-from mymath import Vector
+from mymath import Vector, Angle
 from math import asin, acos, degrees, cos
 
 
@@ -44,10 +44,6 @@ class Model:
         self.corners.draw(painter)
         self.ribs.draw(painter)
         self.centers.draw(painter)
-
-        # pen = QPen(Qt.black, 2)
-        # painter.setPen(pen)
-        # self.sides.draw(painter, self.visible_sides)
 
     def scale(self, k):
         k = k if k else 1
@@ -91,18 +87,6 @@ class Model:
 
         self.move(self.center_point)
 
-    def get_side_center(self, name):
-        corners = self.corners.corners
-        side_center = Point(0, 0, 0)
-
-        for corner in corners:
-            if name in corner:
-                side_center += corners[corner].get_average()
-
-        side_center /= len(corners)
-        print(f'{side_center = }')
-        return side_center
-
     def turn_ox_funcs(self, sin_angle, cos_angle):
         self.corners.turn_ox_funcs(sin_angle, cos_angle)
         self.ribs.turn_ox_funcs(sin_angle, cos_angle)
@@ -117,31 +101,42 @@ class Model:
         self.corners.turn_oz_funcs(sin_angle, cos_angle)
         self.ribs.turn_oz_funcs(sin_angle, cos_angle)
         self.centers.turn_oz_funcs(sin_angle, cos_angle)
-    
-    def turn_side(self, name, angle):
-        self.move(-self.center_point)
 
-        direction_vector = Vector(Point(0, 0, 0), self.centers.sides_centers[name])
-        direction_vector.normalize()
-
-        d = direction_vector.get_length_xy()
-        try:
-            cos_alpha, sin_alpha = direction_vector.y / d, direction_vector.x / d  # to yz plane
-        except ZeroDivisionError:
-            cos_alpha, sin_alpha = 1, 0
-        cos_beta, sin_beta = d, -direction_vector.z  # to y
-
-        self.turn_oz_funcs(sin_alpha, cos_alpha)
-        self.turn_ox_funcs(sin_beta, cos_beta)
+    def turn_side_elements(self, name, angle, alpha, beta):
+        self.turn_oz_funcs(alpha.sin, alpha.cos)
+        self.turn_ox_funcs(beta.sin, beta.cos)
 
         self.corners.turn_side_oy(name, angle)
         self.ribs.turn_side_oy(name, angle)
         self.centers.turn_side_oy(name, angle)
 
-        self.turn_ox_funcs(-sin_beta, cos_beta)
-        self.turn_oz_funcs(-sin_alpha, cos_alpha)
+        self.turn_ox_funcs(-beta.sin, beta.cos)
+        self.turn_oz_funcs(-alpha.sin, alpha.cos)
+
+    def turn_side(self, name, angle):
+        self.move(-self.center_point)
+
+        direction_vector = Vector(Point(0, 0, 0), self.centers.sides_centers[name])
+        direction_vector.normalize()
+        d = direction_vector.get_length_xy()
+
+        alpha = Angle()  # to yz plane
+        beta = Angle()  # to y
+        try:
+            alpha.set_cos(direction_vector.y / d)
+            alpha.set_sin(direction_vector.x / d)
+        except ZeroDivisionError:
+            alpha.set_cos(1)
+            alpha.set_sin(0)
+        beta.set_cos(d)
+        beta.set_sin(-direction_vector.z)
+
+        self.turn_side_elements(name, angle, alpha, beta)
 
         self.move(self.center_point)
+
+    def update_sides(self):
+        pass
 
     def set_matrix_body(self):
         '''

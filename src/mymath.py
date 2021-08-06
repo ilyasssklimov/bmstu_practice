@@ -46,6 +46,22 @@ class Vector:
     '''
 
 
+class Angle:
+    def __init__(self):
+        self.angle = 0
+        self.sin = 0
+        self.cos = 1
+
+    def set_angle(self, angle):
+        self.angle = angle
+
+    def set_sin(self, sin_angle):
+        self.sin = sin_angle
+
+    def set_cos(self, cos_angle):
+        self.cos = cos_angle
+
+
 def radians(angle):
     return angle * pi / 180
 

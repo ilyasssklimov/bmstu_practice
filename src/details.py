@@ -1,6 +1,5 @@
 import config
 from copy import deepcopy
-from errors import SideNameError
 from point import Point
 
 
@@ -52,16 +51,6 @@ class Detail:
         for edge in self.edges:
             start, finish = self.vertices[edge.first], self.vertices[edge.second]
             painter.create_line(start.x, start.y, finish.x, finish.y)
-
-    def get_average(self):
-        average = Point(0, 0, 0)
-
-        for vertex in self.vertices:
-            average += vertex
-
-        average /= len(self.vertices)
-
-        return average
 
 
 class Corner(Detail):
