@@ -13,6 +13,15 @@ class Point:
     def __repr__(self):
         return str(self)
 
+    def __iadd__(self, other):
+        self.x += other.x
+        self.y += other.y
+        self.z += other.z
+        return self
+
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y, self.z + other.z)
+
     def __sub__(self, other):
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
@@ -21,6 +30,12 @@ class Point:
 
     def __truediv__(self, other):
         return Point(self.x / other, self.y / other, self.z / other)
+
+    def __itruediv__(self, other):
+        self.x /= other
+        self.y /= other
+        self.z /= other
+        return self
 
     def move(self, point):
         self.x += point.x
@@ -47,3 +62,17 @@ class Point:
         self.x = x * cos_deg(angle) - y * sin_deg(angle)
         self.y = x * sin_deg(angle) + y * cos_deg(angle)
 
+    def turn_ox_funcs(self, sin_angle, cos_angle):
+        y, z = self.y, self.z
+        self.y = y * cos_angle - z * sin_angle
+        self.z = y * sin_angle + z * cos_angle
+
+    def turn_oy_funcs(self, sin_angle, cos_angle):
+        x, z = self.x, self.z
+        self.x = x * cos_angle + z * sin_angle
+        self.z = -x * sin_angle + z * cos_angle
+
+    def turn_oz_funcs(self, sin_angle, cos_angle):
+        x, y = self.x, self.y
+        self.x = x * cos_angle - y * sin_angle
+        self.y = x * sin_angle + y * cos_angle

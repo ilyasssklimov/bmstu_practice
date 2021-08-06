@@ -413,3 +413,17 @@ class CubeConfig:
                 positions['D'].append((dx, offset, dy))
 
         return positions
+
+    def get_sides_centers(self):
+        offset = Config().size
+        sides_centers = {
+            'R': (offset, 0, 0),
+            'L': (-offset, 0, 0),
+            'U': (0, -offset, 0),
+            'D': (0, offset, 0),
+            'F': (0, 0, offset),
+            'B': (0, 0, -offset)
+        }
+        sides_centers = {side: Point(*center) for side, center in sides_centers.items()}
+
+        return sides_centers

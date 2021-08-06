@@ -1,4 +1,4 @@
-from math import pi, sin, cos
+from math import pi, sin, cos, sqrt
 
 
 class Vector:
@@ -24,6 +24,14 @@ class Vector:
     def get_vector(self):
         return [self.x, self.y, self.z]
 
+    def normalize(self):
+        d = sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+        self.x /= d
+        self.y /= d
+        self.z /= d
+
+    def get_length_xy(self):
+        return sqrt(self.x ** 2 + self.y ** 2)
     '''
     def get_normal(self):  # , start_2, finish_2):
         if self.x:

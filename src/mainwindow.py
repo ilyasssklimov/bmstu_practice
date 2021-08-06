@@ -14,8 +14,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.model = None
         self.k = 10
-        self.angle = 15
+        self.angle = 45
         self.speed = 2
+        self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
 
         self.x = 0
@@ -25,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.loadButton.clicked.connect(self.load_model)
         self.scaleSlider.valueChanged.connect(self.scale_model)
+        self.sizeModel.currentTextChanged.connect(self.load_model)
 
         self.rotate_y_.clicked.connect(lambda: self.turn_model_oy(self.angle))
         self.rotate_y.clicked.connect(lambda: self.turn_model_oy(-self.angle))
@@ -34,9 +36,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.rotate_z_.clicked.connect(lambda: self.turn_model_oz(-self.angle))
         # TODO: кастомизировать кнопки поворота
 
-        self.right.clicked.connect(lambda: self.turn_edge('R'))
-        self.up.clicked.connect(lambda: self.turn_edge('U'))
-        self.front.clicked.connect(lambda: self.turn_edge('F'))
+        self.right.clicked.connect(lambda: self.turn_edge('R', 10))
+        self.up.clicked.connect(lambda: self.turn_edge('U', 10))
+        self.front.clicked.connect(lambda: self.turn_edge('F', 10))
+        self.left.clicked.connect(lambda: self.turn_edge('L', 10))
+        self.down.clicked.connect(lambda: self.turn_edge('D', 10))
+        self.back.clicked.connect(lambda: self.turn_edge('B', 10))
 
     def load_model(self):
         self.scaleSlider.setValue(10)
@@ -45,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
-            self.model = Cube(3)
+            self.model = Cube(int(self.sizeModel.currentText().split('x')[0]))
             # self.model.turn_model_oy(45)
             # self.model.turn_model_ox(-30)
             self.update()
@@ -55,15 +60,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def paintEvent(self, event):
         painter = QtDrawer()
         painter.begin(self)
-
-        self.model.draw_model(painter)
-
-        '''
-        invisible_sides, inside_invisible_edges = self.model.get_invisible_sides(self.model.sides,
-                                                                                 self.model.sides_edges,
-                                                                                 self.model.inside_sides_edges)
-        self.model.draw_model(painter, invisible_sides, inside_invisible_edges)
-        '''
+        self.model.draw(painter)
         painter.end()
 
     def scale_model(self):
@@ -92,15 +89,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.update()
 
     def turn_model_ox(self, angle):
-        self.model.turn_model_ox(angle)
+        self.model.turn_ox(angle)
         self.update()
 
     def turn_model_oy(self, angle):
-        self.model.turn_model_oy(angle)
+        self.model.turn_oy(angle)
         self.update()
 
     def turn_model_oz(self, angle):
-        self.model.turn_model_oz(angle)
+        self.model.turn_oz(angle)
         self.update()
 
     def mousePressEvent(self, event):
@@ -123,6 +120,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.x, self.y = x1, y1
 
-    def turn_edge(self, name):
-        self.model.turn_edge(name)
+    def turn_edge(self, name, angle):
+        self.model.turn_side(name, angle)
         self.update()
