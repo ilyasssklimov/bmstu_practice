@@ -14,7 +14,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.model = None
         self.k = 10
         self.angle = 45
-        self.speed = 1
+        self.speed = 2
         self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
 
@@ -47,6 +47,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.left.clicked.connect(lambda: self.start_turning_side('L', 1))
         self.down.clicked.connect(lambda: self.start_turning_side('D', 1))
         self.back.clicked.connect(lambda: self.start_turning_side('B', 1))
+
+        self.right_.clicked.connect(lambda: self.start_turning_side('R', -1))
+        self.up_.clicked.connect(lambda: self.start_turning_side('U', -1))
+        self.front_.clicked.connect(lambda: self.start_turning_side('F', -1))
+        self.left_.clicked.connect(lambda: self.start_turning_side('L', -1))
+        self.down_.clicked.connect(lambda: self.start_turning_side('D', -1))
+        self.back_.clicked.connect(lambda: self.start_turning_side('B', -1))
 
     def load_model(self):
         self.scaleSlider.setValue(10)
@@ -132,7 +139,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def start_turning_side(self, name, direction):
         if self.duration == 0:
             self.set_turning_params(name, direction)
-            self.timer.start(1)
+            self.timer.start(0)
 
     def turn_side(self):
         self.duration += 1
@@ -145,4 +152,5 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.update_sides()
 
     def update_sides(self):
-        self.model.update_sides()
+        self.model.update_sides(self.turning_side, self.turning_direction)
+        self.update()

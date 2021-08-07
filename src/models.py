@@ -11,12 +11,13 @@ from math import asin, acos, degrees, cos
 
 class Model:
     # TODO: добавить матрицы преобразований (и для координат, и для матрицы тела)
-    def __init__(self, corners, ribs, centers):
+    def __init__(self, corners, ribs, centers, n):
+        self.n = n
         self.corners = corners
         self.ribs = ribs
         self.centers = centers
-        self.k = 1
 
+        self.k = 1
         cfg = Config()
         dx, dy, dz = cfg.dx, cfg.dy, cfg.dz
         self.center_point = Point(dx, dy, dz)
@@ -116,6 +117,7 @@ class Model:
     def turn_side(self, name, angle):
         self.move(-self.center_point)
 
+        # TODO: вынести в отдельную функцию и возможно создть класс с данными для поворота
         direction_vector = Vector(Point(0, 0, 0), self.centers.sides_centers[name])
         direction_vector.normalize()
         d = direction_vector.get_length_xy()
@@ -135,8 +137,10 @@ class Model:
 
         self.move(self.center_point)
 
-    def update_sides(self):
-        pass
+    def update_sides(self, side, direction):
+        self.corners.update_sides(side, direction)
+        if self.n > 2:
+            self.ribs.update_sides(side, direction)
 
     def set_matrix_body(self):
         '''
@@ -195,7 +199,7 @@ class Cube(Model):
         # sides = CubeSides(cfg.inner_vertices, cfg.sides, carcass)
         # edges = CubeEdges()
 
-        super().__init__(corners, ribs, centers)
+        super().__init__(corners, ribs, centers, n)
 
         '''
         vertices = CubeConfig().vertices

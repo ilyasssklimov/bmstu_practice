@@ -92,6 +92,12 @@ def add_repeats(points_1, points_2):
     return points_1 + points_2 + general
 
 
+def find_by_key(d, key):
+    key = sorted(list(key))
+    for k in d:
+        if sorted(list(k)) == key:
+            return k
+
 '''
 def scalar_multiplication(vector_1, vector_2):
     return vector_1.x * vector_2.x + vector_1.y * vector_2.y + vector_1.z * vector_2.z

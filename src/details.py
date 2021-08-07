@@ -1,7 +1,10 @@
 import config
 from copy import deepcopy
+from mymath import find_by_key
 from point import Point
 
+
+# TODO: наследовать детьали от одного класса
 
 class Detail:
     def __init__(self, vertices, edges):
@@ -111,6 +114,19 @@ class Corners:
             if name in key:
                 self.corners[key].turn_oy(angle)
 
+    def update_sides(self, side, direction):
+        exchange = config.CubeConfig().exchanges_corners[side]
+
+        dir_range = range(len(exchange) - 2, -1, -1) if direction > 0 else range(1, len(exchange))
+        saved_ind = -1 if direction > 0 else 0
+
+        tmp = self.corners[find_by_key(self.corners, exchange[saved_ind])]
+        for i in dir_range:
+            i_to = find_by_key(self.corners, exchange[i + direction])
+            i_from = find_by_key(self.corners, exchange[i])
+            self.corners[i_to] = self.corners[i_from]
+        self.corners[find_by_key(self.corners, exchange[saved_ind + direction])] = tmp
+
 
 class Rib(Detail):
     def __init__(self, vertices, edges, offset):
@@ -181,6 +197,19 @@ class Ribs:
             if name in key:
                 for rib in self.ribs[key]:
                     rib.turn_oy(angle)
+
+    def update_sides(self, side, direction):
+        exchange = config.CubeConfig().exchanges_ribs[side]
+
+        dir_range = range(len(exchange) - 2, -1, -1) if direction > 0 else range(1, len(exchange))
+        saved_ind = -1 if direction > 0 else 0
+
+        tmp = self.ribs[find_by_key(self.ribs, exchange[saved_ind])]
+        for i in dir_range:
+            i_to = find_by_key(self.ribs, exchange[i + direction])
+            i_from = find_by_key(self.ribs, exchange[i])
+            self.ribs[i_to] = self.ribs[i_from]
+        self.ribs[find_by_key(self.ribs, exchange[saved_ind + direction])] = tmp
 
 
 class Center(Detail):
