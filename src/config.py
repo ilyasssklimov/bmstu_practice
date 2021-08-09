@@ -6,6 +6,9 @@ from errors import SideNameError
 from point import Point
 
 
+EPS = 1e5
+
+
 class Config:
     def __init__(self):
         self.size = 150
@@ -21,24 +24,6 @@ class CubeConfig:
     def __init__(self, n=3):
         self.n = n
         self.size = Config().size / self.n
-
-        self.exchanges_corners = {
-            'R': ['RFU', 'RBU', 'RBD', 'RFD'],
-            'L': ['LFU', 'LFD', 'LBD', 'LBU'],
-            'U': ['ULF', 'ULB', 'URB', 'URF'],
-            'D': ['DLF', 'DRF', 'DRB', 'DLB'],
-            'F': ['FLU', 'FRU', 'FRD', 'FLD'],
-            'B': ['BLU', 'BLD', 'BRD', 'BRU']
-        }
-
-        self.exchanges_ribs = {
-            'R': ['RU', 'RB', 'RD', 'RF'],
-            'L': ['LU', 'LF', 'LD', 'LB'],
-            'U': ['UF', 'UL', 'UB', 'UR'],
-            'D': ['DF', 'DR', 'DB', 'DL'],
-            'F': ['FU', 'FR', 'FD', 'FL'],
-            'B': ['BU', 'BL', 'BD', 'BR']
-        }
 
     def get_center_data(self, name):
         if name == 'L':
@@ -100,35 +85,35 @@ class CubeConfig:
 
     def get_eccentric_data(self):
         vertices = [
-            (-self.size, self.size, self.size),
-            (-self.size, -self.size, self.size),
-            (self.size, -self.size, self.size),
-            (self.size, self.size, self.size),
+            (-self.size, self.size, self.size),  # LDF
+            (-self.size, -self.size, self.size),  # LUF
+            (self.size, -self.size, self.size),  # RUF
+            (self.size, self.size, self.size),  # RDF
 
-            (-self.size, self.size, -self.size),
-            (-self.size, -self.size, -self.size),
-            (self.size, -self.size, -self.size),
-            (self.size, self.size, -self.size),
+            (-self.size, self.size, -self.size),  # LDB
+            (-self.size, -self.size, -self.size),  # LUB
+            (self.size, -self.size, -self.size),  # RUB
+            (self.size, self.size, -self.size),  # RDB
         ]
         vertices = [Point(*vertex) for vertex in vertices]
 
-        edges = [
-            (0, 1),
-            (1, 2),
-            (2, 3),
-            (3, 0),
+        edges = {
+            'LF': (0, 1),
+            'UF': (1, 2),
+            'RF': (2, 3),
+            'DF': (3, 0),
 
-            (0, 4),
-            (1, 5),
-            (2, 6),
-            (3, 7),
+            'LD': (0, 4),
+            'LU': (1, 5),
+            'RU': (2, 6),
+            'RD': (3, 7),
 
-            (4, 5),
-            (5, 6),
-            (6, 7),
-            (7, 4)
-        ]
-        edges = [Edge(*edge) for edge in edges]
+            'LB': (4, 5),
+            'UB': (5, 6),
+            'RB': (6, 7),
+            'DB': (7, 4)
+        }
+        edges = {key: Edge(*edge) for key, edge in edges.items()}
 
         return vertices, edges
 
@@ -243,3 +228,39 @@ class CubeConfig:
 
         return sides_centers
 
+    def get_exchanges_corners(self):
+        exchanges_corners = {
+            'R': ['RFU', 'RBU', 'RBD', 'RFD'],
+            'L': ['LFU', 'LFD', 'LBD', 'LBU'],
+            'U': ['ULF', 'ULB', 'URB', 'URF'],
+            'D': ['DLF', 'DRF', 'DRB', 'DLB'],
+            'F': ['FLU', 'FRU', 'FRD', 'FLD'],
+            'B': ['BLU', 'BLD', 'BRD', 'BRU']
+        }
+
+        return exchanges_corners
+
+    def get_exchanges_ribs(self):
+        exchanges_ribs = {
+            'R': ['RU', 'RB', 'RD', 'RF'],
+            'L': ['LU', 'LF', 'LD', 'LB'],
+            'U': ['UF', 'UL', 'UB', 'UR'],
+            'D': ['DF', 'DR', 'DB', 'DL'],
+            'F': ['FU', 'FR', 'FD', 'FL'],
+            'B': ['BU', 'BL', 'BD', 'BR']
+        }
+
+        return exchanges_ribs
+
+    def get_sides(self):
+        # you can choose another
+        sides = {
+            ('U', 'RFU'): ('RU', 'UF'),
+            ('D', 'RFD'): ('DF', 'RD'),
+            ('R', 'RBU'): ('RF', 'RU'),
+            ('L', 'LBU'): ('LU', 'LF'),
+            ('F', 'LFU'): ('LF', 'UF'),
+            ('B', 'RBD'): ('LB', 'UB')
+        }
+
+        return sides

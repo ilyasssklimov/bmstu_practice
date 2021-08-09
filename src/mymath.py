@@ -88,8 +88,11 @@ def sign(num):
 
 
 def add_repeats(points_1, points_2):
-    general = list(set(points_1) & set(points_2))
-    return points_1 + points_2 + general
+    general = list(set(points_1) & set(points_2))[0]
+    points_1.remove(general)
+    points_2.remove(general)
+    general = [general]
+    return general + points_1 + general + points_2 + general
 
 
 def find_by_key(d, key):

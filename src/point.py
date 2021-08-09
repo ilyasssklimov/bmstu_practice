@@ -76,3 +76,6 @@ class Point:
         x, y = self.x, self.y
         self.x = x * cos_angle - y * sin_angle
         self.y = x * sin_angle + y * cos_angle
+
+    def get_homogenous_coordinates(self):
+        return [self.x, self.y, self.z, 1]

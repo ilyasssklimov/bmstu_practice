@@ -1,5 +1,5 @@
 from collections import Counter
-from config import Config, CubeConfig
+from config import Config, CubeConfig, EPS
 from details import Corners, Ribs, Centers
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
@@ -18,33 +18,26 @@ class Model:
         self.centers = centers
 
         self.k = 1
+
         cfg = Config()
         dx, dy, dz = cfg.dx, cfg.dy, cfg.dz
         self.center_point = Point(dx, dy, dz)
 
         self.matrix_center = [dx, dy, dz, 1]
-        self.viewer = [dx, dy, 1000000, 0]
-
+        self.viewer = [dx, dy, dz + 100000, 0]
         self.matrix_body = None
-        self.set_matrix_body()
-
-        # self.transform_matrix = MatrixTransform()
         self.visible_sides = []
-        '''
-        self.vertices = vertices
-        self.edges = edges
-        self.inside_vertices = inside_vertices
-        self.inside_edges = inside_edges
-        '''
-
-    def draw(self, painter):
         self.set_visible_sides()
 
+        # self.transform_matrix = MatrixTransform()
+
+    def draw(self, painter):
         pen = QPen(Qt.black, 4)
         painter.setPen(pen)
-        self.corners.draw(painter)
-        self.ribs.draw(painter)
-        self.centers.draw(painter)
+
+        self.corners.draw(painter, self.visible_sides)
+        self.ribs.draw(painter, self.visible_sides)
+        self.centers.draw(painter, self.visible_sides)
 
     def scale(self, k):
         k = k if k else 1
@@ -70,6 +63,8 @@ class Model:
 
         self.move(self.center_point)
 
+        self.set_visible_sides()
+
     def turn_oy(self, angle):
         self.move(-self.center_point)
 
@@ -79,6 +74,8 @@ class Model:
 
         self.move(self.center_point)
 
+        self.set_visible_sides()
+
     def turn_oz(self, angle):
         self.move(-self.center_point)
 
@@ -87,6 +84,8 @@ class Model:
         self.centers.turn_oz(angle)
 
         self.move(self.center_point)
+
+        self.set_visible_sides()
 
     def turn_ox_funcs(self, sin_angle, cos_angle):
         self.corners.turn_ox_funcs(sin_angle, cos_angle)
@@ -143,8 +142,7 @@ class Model:
             self.ribs.update_sides(side, direction)
 
     def set_matrix_body(self):
-        '''
-        sides = self.carcass.create_plane_points()
+        sides = self.corners.create_plane_points()
         coefficients = {}
 
         for key, value in sides.items():
@@ -152,18 +150,15 @@ class Model:
             coefficients[key] = plane.get_determinant()
 
         self.matrix_body = MatrixBody(coefficients)
-        '''
-        pass
+        self.matrix_body.adjust(self.matrix_center)  # ???
         # TODO: понять, почему не работает
-        # self.matrix_body.adjust(self.matrix_center)  # ???
 
     def set_visible_sides(self):
         self.set_matrix_body()
-        # result = self.matrix_body.multiplication_vector(self.viewer)
-        # sides = self.matrix_body.sides
-        # sides_edges = self.carcass.sides
-
-        # self.visible_sides = [side for side, value in zip(sides, result) if value >= 0]
+        result = self.matrix_body.multiplication_vector(self.viewer)
+        sides = self.matrix_body.sides
+        self.visible_sides = [side for side, value in zip(sides, result) if value > EPS]
+        print(self.visible_sides)
 
         # for side, value in zip(sides_edges, result):
 
@@ -182,11 +177,6 @@ class Model:
         #     inside_invisible_edges.extend(side)
 
         # return visible_sides  # , inside_invisible_edges
-
-    def turn_edge(self, name):
-        pass
-        # self.edges.set_vertices(self.carcass, self.sides, name)
-        # self.edges.turn_edge(name)
 
 
 class Cube(Model):

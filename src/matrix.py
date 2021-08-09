@@ -98,8 +98,11 @@ class MatrixPlane:
 
         for i in range(3):
             minor = self.get_minor(i)
+            if i == 1:
+                minor *= -1
             result.append(minor)
-            d += self.matrix[0][i] * minor
+            tmp = self.matrix[0][i] * minor
+            d += tmp
 
         result.append(d)
         return result
@@ -115,7 +118,7 @@ class MatrixBody:
         result = ''
         for i in range(len(self.coefficients[0])):
             for j in range(self.size):
-                result += f'{self.coefficients[j][i]:^10.1f}'
+                result += f'{self.coefficients[j][i]:^14.1f}'
             result += '\n'
 
         return result

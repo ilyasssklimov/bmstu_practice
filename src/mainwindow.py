@@ -13,7 +13,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.model = None
         self.k = 10
-        self.angle = 45
+        self.angle = 15
         self.speed = 2
         self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
@@ -63,8 +63,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
             self.model = Cube(int(self.sizeModel.currentText().split('x')[0]))
-            self.model.turn_oy(45)
-            self.model.turn_ox(-30)
+            # self.model.turn_oy(45)
+            # self.model.turn_ox(-30)
             self.update()
         else:
             print('Another model')

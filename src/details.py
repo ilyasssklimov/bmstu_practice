@@ -1,10 +1,12 @@
 import config
 from copy import deepcopy
-from mymath import find_by_key
+from mymath import find_by_key, add_repeats
 from point import Point
 
 
 # TODO: наследовать детьали от одного класса
+# TODO: убрать дублирование кода, рефакторинг!
+
 
 class Detail:
     def __init__(self, vertices, edges):
@@ -50,10 +52,11 @@ class Detail:
         for vertex in self.vertices:
             vertex.turn_oz_funcs(sin_angle, cos_angle)
 
-    def draw(self, painter):
-        for edge in self.edges:
-            start, finish = self.vertices[edge.first], self.vertices[edge.second]
-            painter.create_line(start.x, start.y, finish.x, finish.y)
+    def draw(self, painter, visible_sides):
+        for key, edge in self.edges.items():
+            if set(visible_sides) & set(key):
+                start, finish = self.vertices[edge.first], self.vertices[edge.second]
+                painter.create_line(start.x, start.y, finish.x, finish.y)
 
 
 class Corner(Detail):
@@ -61,6 +64,26 @@ class Corner(Detail):
         super().__init__(vertices, edges)
         self.move(offset)
         self.move(config.Config().center)
+
+
+class Rib(Detail):
+    def __init__(self, vertices, edges, offset):
+        super().__init__(vertices, edges)
+        self.move(offset)
+        self.move(config.Config().center)
+
+
+class Center(Detail):
+    def __init__(self, vertices, edges, offset, side):
+        super().__init__(vertices, edges)
+        self.move(offset)
+        self.move(config.Config().center)
+        self.side = side
+
+    def draw(self, painter, visible_sides=None):
+        for edge in self.edges:
+            start, finish = self.vertices[edge.first], self.vertices[edge.second]
+            painter.create_line(start.x, start.y, finish.x, finish.y)
 
 
 class Corners:
@@ -73,9 +96,9 @@ class Corners:
         for key, value in positions.items():
             self.corners[key] = Corner(deepcopy(vertices), edges, Point(*value))
 
-    def draw(self, painter):
+    def draw(self, painter, visible_sides):
         for key in self.corners:
-            self.corners[key].draw(painter)
+            self.corners[key].draw(painter, visible_sides)
 
     def move(self, point):
         for key in self.corners:
@@ -115,7 +138,7 @@ class Corners:
                 self.corners[key].turn_oy(angle)
 
     def update_sides(self, side, direction):
-        exchange = config.CubeConfig().exchanges_corners[side]
+        exchange = config.CubeConfig().get_exchanges_corners()[side]
 
         dir_range = range(len(exchange) - 2, -1, -1) if direction > 0 else range(1, len(exchange))
         saved_ind = -1 if direction > 0 else 0
@@ -127,12 +150,16 @@ class Corners:
             self.corners[i_to] = self.corners[i_from]
         self.corners[find_by_key(self.corners, exchange[saved_ind + direction])] = tmp
 
+    def create_plane_points(self):
+        sides = config.CubeConfig().get_sides()
+        points = {}
 
-class Rib(Detail):
-    def __init__(self, vertices, edges, offset):
-        super().__init__(vertices, edges)
-        self.move(offset)
-        self.move(config.Config().center)
+        for key, value in sides.items():
+            corner = self.corners[key[1]]
+            points[key[0]] = add_repeats(corner.edges[value[0]].get_points(corner.vertices),
+                                         corner.edges[value[1]].get_points(corner.vertices))
+
+        return points
 
 
 class Ribs:
@@ -147,10 +174,10 @@ class Ribs:
                 for position in positions[key]:
                     self.ribs[key].append(Rib(deepcopy(vertices), edges, Point(*position)))
 
-    def draw(self, painter):
+    def draw(self, painter, visible_sides):
         for key in self.ribs:
             for rib in self.ribs[key]:
-                rib.draw(painter)
+                rib.draw(painter, visible_sides)
 
     def move(self, point):
         for key in self.ribs:
@@ -199,7 +226,7 @@ class Ribs:
                     rib.turn_oy(angle)
 
     def update_sides(self, side, direction):
-        exchange = config.CubeConfig().exchanges_ribs[side]
+        exchange = config.CubeConfig().get_exchanges_ribs()[side]
 
         dir_range = range(len(exchange) - 2, -1, -1) if direction > 0 else range(1, len(exchange))
         saved_ind = -1 if direction > 0 else 0
@@ -210,13 +237,6 @@ class Ribs:
             i_from = find_by_key(self.ribs, exchange[i])
             self.ribs[i_to] = self.ribs[i_from]
         self.ribs[find_by_key(self.ribs, exchange[saved_ind + direction])] = tmp
-
-
-class Center(Detail):
-    def __init__(self, vertices, edges, offset):
-        super().__init__(vertices, edges)
-        self.move(offset)
-        self.move(config.Config().center)
 
 
 class Centers:
@@ -231,7 +251,7 @@ class Centers:
                 vertices, edges = cfg.get_center_data(key)
                 self.centers[key] = []
                 for position in positions[key]:
-                    self.centers[key].append(Center(deepcopy(vertices), edges, Point(*position)))
+                    self.centers[key].append(Center(deepcopy(vertices), edges, Point(*position), key))
 
     def init_sides_centers(self):
         sides_centers = config.CubeConfig(self.n).get_sides_centers()
@@ -240,8 +260,8 @@ class Centers:
 
         return sides_centers
 
-    def draw(self, painter):
-        for key in self.centers:
+    def draw(self, painter, visible_sides):
+        for key in visible_sides:
             for center in self.centers[key]:
                 center.draw(painter)
 

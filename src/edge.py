@@ -14,6 +14,9 @@ class Edge:
 
     def __contains__(self, item):
         if isinstance(item, list):
+            print(item)
+            print(self.first)
+            print(self.second)
             for i in item:
                 if i in self.first and i in self.second:
                     return True
