@@ -84,9 +84,11 @@ class MatrixTransform:
 class MatrixPlane:
     def __init__(self, vector):
         self.matrix = []
-        self.matrix.append(Vector(vector[4], Point(0, 0, 0)).get_vector())
-        self.matrix.append(Vector(vector[0], vector[1]).get_vector())
-        self.matrix.append(Vector(vector[2], vector[3]).get_vector())
+        point_1, point_2, general = vector[0], vector[1], vector[2]
+
+        self.matrix.append(Vector(general, Point()).get_vector())
+        self.matrix.append(Vector(general, point_1).get_vector())
+        self.matrix.append(Vector(general, point_2).get_vector())
 
     def get_minor(self, i):
         minor_matrix = [self.matrix[j][:i] + self.matrix[j][i+1:] for j in range(1, 3)]

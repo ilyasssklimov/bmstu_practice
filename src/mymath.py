@@ -88,11 +88,11 @@ def sign(num):
 
 
 def add_repeats(points_1, points_2):
-    general = list(set(points_1) & set(points_2))[0]
-    points_1.remove(general)
-    points_2.remove(general)
-    general = [general]
-    return general + points_1 + general + points_2 + general
+    p_1, p_2 = set(points_1), set(points_2)
+    general = p_1 & p_2
+    result = list(p_1 | p_2 - general) + list(general)
+
+    return result
 
 
 def find_by_key(d, key):
@@ -100,8 +100,4 @@ def find_by_key(d, key):
     for k in d:
         if sorted(list(k)) == key:
             return k
-
-'''
-def scalar_multiplication(vector_1, vector_2):
-    return vector_1.x * vector_2.x + vector_1.y * vector_2.y + vector_1.z * vector_2.z
-'''
+    raise KeyError('There is no such key in dictionary')
