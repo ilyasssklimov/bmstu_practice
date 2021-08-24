@@ -101,3 +101,17 @@ def find_by_key(d, key):
         if sorted(list(k)) == key:
             return k
     raise KeyError('There is no such key in dictionary')
+
+
+def find_y_min_max(vertices):
+    if isinstance(vertices, list):
+        cur_vertices = vertices
+    elif isinstance(vertices, dict):
+        cur_vertices = vertices.values()
+    else:
+        raise ValueError('Vertices should be list or dict')
+
+    y_list = [vertex.y for vertex in cur_vertices]
+    y_min, y_max = min(y_list), max(y_list)
+
+    return y_min, y_max

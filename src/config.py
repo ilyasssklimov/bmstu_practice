@@ -14,8 +14,11 @@ class Config:
         self.size = 150
         self.width = 1050
         self.height = 760
-        self.dx = self.width / 2 + 30
-        self.dy = self.height / 2 + 30
+        self.offset_x = 30
+        self.offset_y = 30
+
+        self.dx = self.width / 2 + self.offset_x
+        self.dy = self.height / 2 + self.offset_y
         self.dz = 0
         self.center = Point(self.dx, self.dy, self.dz)
 
@@ -27,95 +30,136 @@ class CubeConfig:
 
     def get_center_data(self, name):
         if name == 'L':
-            vertices = [
-                (-self.size, self.size, self.size),
-                (-self.size, -self.size, self.size),
-                (-self.size, -self.size, -self.size),
-                (-self.size, self.size, -self.size)
+            vertices = {
+                'LFD': (-self.size, self.size, self.size),
+                'LFU': (-self.size, -self.size, self.size),
+                'LBU': (-self.size, -self.size, -self.size),
+                'LBD': (-self.size, self.size, -self.size)
+            }
+            edges = [
+                ('LFD', 'LFU'),
+                ('LFU', 'LBU'),
+                ('LBU', 'LBD'),
+                ('LBD', 'LFD')
             ]
         elif name == 'R':
-            vertices = [
-                (self.size, self.size, self.size),
-                (self.size, -self.size, self.size),
-                (self.size, -self.size, -self.size),
-                (self.size, self.size, -self.size)
+            vertices = {
+                'RFD': (self.size, self.size, self.size),
+                'RFU': (self.size, -self.size, self.size),
+                'RBU': (self.size, -self.size, -self.size),
+                'RBD': (self.size, self.size, -self.size)
+            }
+            edges = [
+                ('RFD', 'RFU'),
+                ('RFU', 'RBU'),
+                ('RBU', 'RBD'),
+                ('RBD', 'RFD')
             ]
         elif name == 'F':
-            vertices = [
-                (-self.size, self.size, self.size),
-                (-self.size, -self.size, self.size),
-                (self.size, -self.size, self.size),
-                (self.size, self.size, self.size)
+            vertices = {
+                'LFD': (-self.size, self.size, self.size),
+                'LFU': (-self.size, -self.size, self.size),
+                'RFU': (self.size, -self.size, self.size),
+                'RFD': (self.size, self.size, self.size)
+            }
+            edges = [
+                ('LFD', 'LFU'),
+                ('LFU', 'RFU'),
+                ('RFU', 'RFD'),
+                ('RFD', 'LFD')
             ]
         elif name == 'B':
-            vertices = [
-                (-self.size, self.size, -self.size),
-                (-self.size, -self.size, -self.size),
-                (self.size, -self.size, -self.size),
-                (self.size, self.size, -self.size)
+            vertices = {
+                'LBD': (-self.size, self.size, -self.size),
+                'LBU': (-self.size, -self.size, -self.size),
+                'RBU': (self.size, -self.size, -self.size),
+                'RBD': (self.size, self.size, -self.size)
+            }
+            edges = [
+                ('LBD', 'LBU'),
+                ('LBU', 'RBU'),
+                ('RBU', 'RBD'),
+                ('RBD', 'LBD')
             ]
         elif name == 'U':
-            vertices = [
-                (-self.size, -self.size, -self.size),
-                (-self.size, -self.size, self.size),
-                (self.size, -self.size, self.size),
-                (self.size, -self.size, -self.size)
+            vertices = {
+                'LBU': (-self.size, -self.size, -self.size),
+                'LFU': (-self.size, -self.size, self.size),
+                'RFU': (self.size, -self.size, self.size),
+                'RBU': (self.size, -self.size, -self.size)
+            }
+            edges = [
+                ('LBU', 'LFU'),
+                ('LFU', 'RFU'),
+                ('RFU', 'RBU'),
+                ('RBU', 'LBU')
             ]
         elif name == 'D':
-            vertices = [
-                (-self.size, self.size, -self.size),
-                (-self.size, self.size, self.size),
-                (self.size, self.size, self.size),
-                (self.size, self.size, -self.size)
+            vertices = {
+                'LBD': (-self.size, self.size, -self.size),
+                'LFD': (-self.size, self.size, self.size),
+                'RFD': (self.size, self.size, self.size),
+                'RBD': (self.size, self.size, -self.size)
+            }
+            edges = [
+                ('LBD', 'LFD'),
+                ('LFD', 'RFD'),
+                ('RFD', 'RBD'),
+                ('RBD', 'LBD')
             ]
         else:
             raise SideNameError
 
-        vertices = [Point(*vertex) for vertex in vertices]
-
-        edges = [
-            (0, 1),
-            (1, 2),
-            (2, 3),
-            (3, 0)
-        ]
+        vertices = {key: Point(*vertex) for key, vertex in vertices.items()}
         edges = [Edge(*edge) for edge in edges]
 
         return vertices, edges
 
     def get_eccentric_data(self):
-        vertices = [
-            (-self.size, self.size, self.size),  # LDF
-            (-self.size, -self.size, self.size),  # LUF
-            (self.size, -self.size, self.size),  # RUF
-            (self.size, self.size, self.size),  # RDF
+        vertices = {
+            'LFD': (-self.size, self.size, self.size),
+            'LFU': (-self.size, -self.size, self.size),
+            'RFU': (self.size, -self.size, self.size),
+            'RFD': (self.size, self.size, self.size),
 
-            (-self.size, self.size, -self.size),  # LDB
-            (-self.size, -self.size, -self.size),  # LUB
-            (self.size, -self.size, -self.size),  # RUB
-            (self.size, self.size, -self.size),  # RDB
-        ]
-        vertices = [Point(*vertex) for vertex in vertices]
+            'LBD': (-self.size, self.size, -self.size),
+            'LBU': (-self.size, -self.size, -self.size),
+            'RBU': (self.size, -self.size, -self.size),
+            'RBD': (self.size, self.size, -self.size)
+        }
+        vertices = {key: Point(*vertex) for key, vertex in vertices.items()}
 
         edges = {
-            'LF': (0, 1),
-            'UF': (1, 2),
-            'RF': (2, 3),
-            'DF': (3, 0),
+            'LF': ('LFD', 'LFU'),
+            'UF': ('LFU', 'RFU'),
+            'RF': ('RFU', 'RFD'),
+            'DF': ('RFD', 'LFD'),
 
-            'LD': (0, 4),
-            'LU': (1, 5),
-            'RU': (2, 6),
-            'RD': (3, 7),
+            'LD': ('LFD', 'LBD'),
+            'LU': ('LFU', 'LBU'),
+            'RU': ('RFU', 'RBU'),
+            'RD': ('RFD', 'RBD'),
 
-            'LB': (4, 5),
-            'UB': (5, 6),
-            'RB': (6, 7),
-            'DB': (7, 4)
+            'LB': ('LBD', 'LBU'),
+            'UB': ('LBU', 'RBU'),
+            'RB': ('RBU', 'RBD'),
+            'DB': ('RBD', 'LBD')
         }
         edges = {key: Edge(*edge) for key, edge in edges.items()}
 
         return vertices, edges
+
+    def get_eccentric_detail_sides(self):
+        sides = {
+            'U': ('UF', 'LU', 'RU', 'UB'),
+            'D': ('DF', 'LD', 'RD', 'DB'),
+            'R': ('RF', 'RU', 'RD', 'RB'),
+            'L': ('LF', 'LD', 'LU', 'LB'),
+            'F': ('LF', 'UF', 'RF', 'DF'),
+            'B': ('LB', 'UB', 'RB', 'DB')
+        }
+
+        return sides
 
     def get_offset_corners(self):
         offset = Config().size * (self.n - 1) / self.n
@@ -252,15 +296,67 @@ class CubeConfig:
 
         return exchanges_ribs
 
+    def get_exchanges_centers(self):
+        exchanges_centers = {
+            'R': ['U', 'B', 'D', 'F'],
+            'L': ['U', 'F', 'D', 'B'],
+            'U': ['F', 'L', 'B', 'R'],
+            'D': ['F', 'R', 'B', 'L'],
+            'F': ['U', 'R', 'D', 'L'],
+            'B': ['U', 'L', 'D', 'R']
+        }
+
+        return exchanges_centers
+
+    def get_carcass(self):
+        size = Config().size
+        vertices = {
+            'LFD': (-size, size, size),
+            'RFD': (size, size, size),
+            'RFU': (size, -size, size),
+            'LFU': (-size, -size, size),
+
+            'LBD': (-size, size, -size),
+            'RBD': (size, size, -size),
+            'RBU': (size, -size, -size),
+            'LBU': (-size, -size, -size),
+        }
+        vertices = {key: Point(*vertex) for key, vertex in vertices.items()}
+
+        return vertices
+
     def get_sides(self):
         # you can choose another
         sides = {
-            ('U', 'RFU'): ('RU', 'UF'),
-            ('D', 'RFD'): ('DF', 'RD'),
-            ('R', 'RBU'): ('RF', 'RU'),
-            ('L', 'LBU'): ('LU', 'LF'),
-            ('F', 'LFU'): ('LF', 'UF'),
-            ('B', 'RBD'): ('LB', 'UB')
+            'U': ('LFU', 'RBU', 'RFU'),
+            'D': ('LFD', 'RBD', 'RFD'),
+            'R': ('RFD', 'RBU', 'RBD'),
+            'L': ('LFD', 'LBU', 'LBD'),
+            'F': ('LFD', 'RFU', 'LFU'),
+            'B': ('LBD', 'RBU', 'LBU')
         }
 
         return sides
+
+    def get_opposite(self, side):
+        sides = {
+            'U': 'D',
+            'D': 'U',
+            'R': 'L',
+            'L': 'R',
+            'F': 'B',
+            'B': 'F'
+        }
+        return sides[side]
+
+    def get_center_colors(self, side):
+        colors = {
+            'F': 'white',
+            'B': 'yellow',
+            'R': 'red',
+            'L': 'orange',
+            'U': 'blue',
+            'D': 'green'
+        }
+
+        return colors[side]

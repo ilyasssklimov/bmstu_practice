@@ -1,3 +1,6 @@
+from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtGui import QPixmap, QColor
+
 from config import Config
 from design import Ui_MainWindow
 from drawer import QtDrawer
@@ -11,10 +14,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.image = QRect(
+            Config().offset_x + 3,
+            Config().offset_y + 3,
+            Config().width - 3,
+            Config().height - 3
+        )
+
         self.model = None
         self.k = 10
         self.angle = 15
-        self.speed = 2
+        self.speed = 1
         self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
 
@@ -63,8 +73,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if model == 'Кубик Рубика':
             # TODO: понять коммутативна ли операция поворота
             self.model = Cube(int(self.sizeModel.currentText().split('x')[0]))
-            # self.model.turn_oy(45)
-            # self.model.turn_ox(-30)
+            self.model.turn_oy(45)
+            self.model.turn_ox(-30)
             self.update()
         else:
             print('Another model')
@@ -72,6 +82,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def paintEvent(self, event):
         painter = QtDrawer()
         painter.begin(self)
+        painter.setBrush(QColor('white'))
+        painter.drawRect(self.image)
         self.model.draw(painter)
         painter.end()
 
@@ -144,13 +156,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def turn_side(self):
         self.duration += 1
         self.model.turn_side(self.turning_side, self.turning_direction)
-        self.update()
 
         if self.duration >= 90:
+            self.update_sides()
             self.timer.stop()
             self.duration = 0
-            self.update_sides()
+
+        self.update()
 
     def update_sides(self):
         self.model.update_sides(self.turning_side, self.turning_direction)
-        self.update()
+    

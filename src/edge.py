@@ -10,13 +10,10 @@ class Edge:
         return str(self)
 
     def get_points(self, vertices):
-        return [vertices[self.first], vertices[self.second]]
+        return vertices[self.first], vertices[self.second]
 
     def __contains__(self, item):
         if isinstance(item, list):
-            print(item)
-            print(self.first)
-            print(self.second)
             for i in item:
                 if i in self.first and i in self.second:
                     return True
