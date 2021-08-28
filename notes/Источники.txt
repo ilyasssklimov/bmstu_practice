@@ -8,3 +8,4 @@
 8) https://ru.wikipedia.org/wiki/%D0%9A%D1%83%D0%B1%D0%B8%D0%BA_%D0%A0%D1%83%D0%B1%D0%B8%D0%BA%D0%B0 - про кубик Рубика
 9) https://habr.com/ru/post/116398/ - заполнение области
 10) https://portal.tpu.ru/SHARED/j/JBOLOTOVA/academic/ComputerGraphics/3.RasterAlgorithms.pdf - заполнение
+11) http://compgraph.tpu.ru/Del_hide_line.htm - алгоритмы удаления невидимых поверхностей
