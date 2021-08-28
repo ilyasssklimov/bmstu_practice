@@ -71,7 +71,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         model = self.models.currentText()
 
         if model == 'Кубик Рубика':
-            # TODO: понять коммутативна ли операция поворота
             self.model = Cube(int(self.sizeModel.currentText().split('x')[0]))
             self.model.turn_oy(45)
             self.model.turn_ox(-30)
