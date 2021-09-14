@@ -12,6 +12,10 @@ EPS = 1e5
 class Config:
     def __init__(self):
         self.size = 150
+
+        self.main_width = 1304
+        self.main_height = 858
+
         self.width = 1050
         self.height = 760
         self.offset_x = 30

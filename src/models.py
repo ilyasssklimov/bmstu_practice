@@ -114,7 +114,6 @@ class Model:
     def turn_side(self, name, angle):
         self.move(-self.center_point)
 
-        # TODO: вынести в отдельную функцию и возможно создть класс с данными для поворота
         direction_vector = Vector(Point(0, 0, 0), self.centers.sides_centers[name])
         direction_vector.normalize()
         d = direction_vector.get_length_xy()

@@ -1,12 +1,11 @@
-from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtGui import QPixmap, QColor
-
 from config import Config
 from design import Ui_MainWindow
 from drawer import QtDrawer
 from models import Cube
 from mymath import sign
 from point import Point
+from PyQt5.QtCore import QRect
+from PyQt5.QtGui import QColor
 from PyQt5 import QtWidgets, QtCore
 
 
@@ -24,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.model = None
         self.k = 10
         self.angle = 15
-        self.speed = 1
+        self.speed = 2
         self.sizeModel.setCurrentText('3x3x3')
         self.load_model()
 
@@ -65,6 +64,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.down_.clicked.connect(lambda: self.start_turning_side('D', -1))
         self.back_.clicked.connect(lambda: self.start_turning_side('B', -1))
 
+        self.turning_keys = {
+            QtCore.Qt.Key_Q: ('L', 1),
+            QtCore.Qt.Key_W: ('U', 1),
+            QtCore.Qt.Key_E: ('R', 1),
+            QtCore.Qt.Key_A: ('L', -1),
+            QtCore.Qt.Key_S: ('U', -1),
+            QtCore.Qt.Key_D: ('R', -1)
+        }
+
     def load_model(self):
         self.scaleSlider.setValue(10)
         self.k = 10
@@ -81,8 +89,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def paintEvent(self, event):
         painter = QtDrawer()
         painter.begin(self)
+
+        # painter.setBrush(QColor('grey'))
+        # painter.drawRect(self.background)
         painter.setBrush(QColor('white'))
         painter.drawRect(self.image)
+
         self.model.draw(painter)
         painter.end()
 
@@ -165,4 +177,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def update_sides(self):
         self.model.update_sides(self.turning_side, self.turning_direction)
-    
+
+    def keyPressEvent(self, event):
+        print(event.key() in self.turning_keys)
+        if event.key() in self.turning_keys and self.duration == 0:
+            self.start_turning_side(*self.turning_keys[event.key()])
